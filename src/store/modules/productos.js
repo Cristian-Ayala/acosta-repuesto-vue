@@ -95,7 +95,10 @@ export default {
                 descripcion: "Todas las luces led",
             }
         ],
-        add: {}
+        add: {},
+        cacheEditProd: null,
+        editedProd: null,
+        editTransaction: [],
     },
     mutations: {
         /*
@@ -148,7 +151,7 @@ export default {
         /*
         eliman registros, correspondiente al id seleccionado
          */
-        removeRegistro: function (state,producto) {
+        removeRegistro: function (state, producto) {
             producto.activoProd = false;
             // this.clearData();
             let x = 0;
@@ -218,6 +221,40 @@ export default {
             });
             // Get its `data-id` attribute value
             console.log(option.getAttribute("data-id"));
-        }
+        },
+        editProd(state, prod) {
+            state.cacheEditProd = JSON.parse(JSON.stringify(prod));
+            state.editedProd = prod;
+        },
+        saveEditProd(state) {
+            var index = state.productos.findIndex(
+                (element) => element.upc === state.cacheEditProd.upc
+            );
+            state.editedProd.saved = true;
+            state.productos.splice(index, 1, state.editedProd);
+
+            //para agregar al array de productos editados
+            let inTran = state.editTransaction.findIndex(el => el.upc === state.editedProd.upc);
+            if (inTran < 0) {
+                state.editTransaction.push(state.editedProd)
+            } else if (inTran >= 0) {
+                state.editTransaction.splice(inTran, 1, state.editedProd);
+            }
+            //FINAL para agregar al array de productos editados
+
+
+            state.editedProd = null;
+            state.cacheEditProd = null;
+        },
+        undoEditProd(state) {
+            var index = state.productos.findIndex(
+                (element) => element.upc === state.cacheEditProd.upc
+            );
+            console.log(index);
+            state.productos.splice(index, 1, state.cacheEditProd);
+            state.editedProd = state.cacheEditProd;
+            state.editedProd = null;
+            state.cacheEditProd = null;
+        },
     }
 }

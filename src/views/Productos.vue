@@ -25,12 +25,20 @@
                 v-model="searchDisplay"
                 placeholder="Buscar producto..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
+                style="width: 50%; display: inline"
               />
+              <b-button
+                variant="warning"
+                v-on:click="addProd()"
+                style="float: right"
+              >
+                Aplicar Cambios
+              </b-button>
             </div>
 
             <b-nav tabs fill>
               <b-nav-item
-                v-for="cat in categorias"
+                v-for="cat in catActivas"
                 :key="cat.nombreCat"
                 :active="tab === cat.nombreCat"
                 @click="tab = cat.nombreCat"
@@ -64,7 +72,7 @@
                   <th>
                     <input
                       type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
+                      v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.upc"
                       class="form-control font-weight-bold"
                     />
@@ -88,7 +96,7 @@
                   <td>
                     <input
                       type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
+                      v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.precioUnit"
                       class="form-control"
                     />
@@ -104,7 +112,7 @@
                   <td>
                     <input
                       type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
+                      v-autowidth="{ maxWidth: '60px', minWidth: '10px' }"
                       v-model="prod.stockProd"
                       class="form-control"
                     />
@@ -114,14 +122,12 @@
                       type="button"
                       @click="removeRegistro(prod)"
                       class="btn btn-outline-danger btn-circle"
-                      data-toggle="modal"
-                      data-target="#eliminarProducto"
                     >
                       <i class="fas fa-times" aria-hidden="true"></i>
-                      <!-- <i class="fa fa-trash" aria-hidden="true"></i> -->
                     </button>
                   </td>
                 </tr>
+                <!-- ----------------------------------------------------------------------- -->
                 <tr
                   v-for="(prod, index) in productos"
                   v-show="
@@ -130,66 +136,105 @@
                     prod.activoProd
                   "
                   :key="index"
+                  :class="{
+                    editing: prod === editedProd,
+                    editRow: prod === editedProd,
+                    editedRow: prod.saved,
+                  }"
                 >
                   <th>
-                    <input
-                      type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
-                      v-model="prod.upc"
-                      class="form-control font-weight-bold"
-                    />
+                    {{ prod.upc }}
                   </th>
                   <td>
+                    <div class="view">
+                      {{ prod.nombreProd }}
+                    </div>
                     <input
                       type="text"
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreProd"
-                      class="form-control"
+                      class="form-control edit"
                     />
                   </td>
                   <td>
+                    <div class="view">
+                      {{ prod.nombreMarca }}
+                    </div>
                     <input
                       type="text"
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreMarca"
-                      class="form-control"
+                      class="form-control edit"
                     />
                   </td>
                   <td>
+                    <div class="view">${{ prod.precioUnit }}</div>
                     <input
                       type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
+                      v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.precioUnit"
-                      class="form-control"
+                      class="form-control edit"
                     />
                   </td>
                   <td>
+                    <div class="view">
+                      {{ prod.descripcion }}
+                    </div>
                     <input
                       type="text"
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.descripcion"
-                      class="form-control"
+                      class="form-control edit"
                     />
                   </td>
                   <td>
+                    <div class="view">
+                      {{ prod.stockProd }}
+                    </div>
                     <input
                       type="text"
-                      v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
+                      v-autowidth="{ maxWidth: '60px', minWidth: '10px' }"
                       v-model="prod.stockProd"
-                      class="form-control"
+                      class="form-control edit"
                     />
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      @click="removeRegistro(prod)"
-                      class="btn btn-outline-danger btn-circle"
-                      data-toggle="modal"
-                      data-target="#eliminarProducto"
-                    >
-                      <!-- <i class="fa fa-trash" aria-hidden="true"></i> -->
-                      <i class="fas fa-times" aria-hidden="true"></i>
-                    </button>
+                    <div class="view">
+                      <button
+                        type="button"
+                        @click="editProd(prod)"
+                        class="btn btn-outline-warning btn-circle"
+                      >
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        @click="removeRegistro(prod)"
+                        class="btn btn-outline-danger btn-circle"
+                        data-toggle="modal"
+                        data-target="#eliminarProducto"
+                      >
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <div class="edit">
+                      <button
+                        type="button"
+                        @click="saveEditProd()"
+                        class="btn btn-outline-success btn-circle"
+                      >
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        @click="undoEditProd()"
+                        class="btn btn-outline-danger btn-circle"
+                        data-toggle="modal"
+                        data-target="#eliminarProducto"
+                      >
+                        <i class="fas fa-undo" aria-hidden="true"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -197,7 +242,7 @@
           </div>
         </div>
       </div>
-      <AgregarProd></AgregarProd>
+      <AgregarProd v-if="false"></AgregarProd>
     </div>
   </div>
 </template>
@@ -218,10 +263,17 @@ export default {
       urlApi: `http://localhost:8080/categoria`,
       tab: "",
       newProd: [],
+      catActivas: [],
     };
   },
   methods: {
-    ...mapMutations("productos", ["clearData", "removeRegistro"]),
+    ...mapMutations("productos", [
+      "clearData",
+      "removeRegistro",
+      "editProd",
+      "saveEditProd",
+      "undoEditProd",
+    ]),
 
     filtro(valor) {
       if (this.searchDisplay.trim() === "") return true;
@@ -244,6 +296,7 @@ export default {
         upc: null,
         nombreMarca: "",
         nombreCategoria: this.tab,
+        edit: false,
       };
       this.newProd.push(producto);
     },
@@ -257,7 +310,12 @@ export default {
     },
   },
   computed: {
-    ...mapState("productos", ["productos", "producto"]),
+    ...mapState("productos", [
+      "productos",
+      "producto",
+      "cacheEditProd",
+      "editedProd",
+    ]),
     ...mapState("categorias", ["categorias"]),
   },
   /*
@@ -266,7 +324,8 @@ export default {
   mounted() {
     //para setear como active el tab del inicio
     this.tab = this.categorias[0].nombreCat;
-
+    this.catActivas = this.categorias.filter((cat) => cat.activoCat);
+    // this.productos = this.productos.forEach((prod) => (prod.edit = false));
     //this.getAll();
   },
 };
@@ -306,5 +365,24 @@ td input {
   height: 2rem;
   padding: 0;
   font-size: 12px;
+}
+.deleteRow {
+  border-left: 0.5rem solid rgb(223, 75, 75);
+}
+.editRow {
+  border-left: 0.5rem solid #ffc107;
+}
+.editedRow {
+  border-left: 0.5rem solid #4b99e8;
+}
+/* Onclick edit-> show inputs intead of text */
+.edit {
+  display: none;
+}
+.editing .edit {
+  display: block;
+}
+.editing .view {
+  display: none;
 }
 </style>
