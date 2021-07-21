@@ -1,56 +1,158 @@
 <template>
   <div>
-    <b-table
-      :sticky-header="true"
-      responsive
-      :items="items"
-      :fields="fields"
-    >
-      <!-- We are using utility class `text-nowrap` to help illustrate horizontal scrolling -->
-      <template>
-        <div class="text-nowrap">Row ID</div>
-      </template>
-      <template #head()="scope">
-        <div class="text-nowrap">
-          Heading {{ scope.label }}
+    <b-modal id="verifyModifications" centered title="Confirmar modificaciones">
+      <div class="card-body">
+        <!-- Div de nuevos productos -->
+        <div v-if="filteredArrayNewProd.length > 0">
+          <b-card no-body class="text-center">
+            <div class="bg-success text-light roundedBorder">
+              <h4>
+                <b>Productos a agregar: ({{ filteredArrayNewProd.length }})</b>
+              </h4>
+            </div>
+          </b-card>
+          <!-- tabla Nuevos productos -->
+          <b-table
+            striped
+            hover
+            :items="filteredArrayNewProd"
+            :fields="headerLabels"
+          ></b-table>
         </div>
+        <!-- Fin de Div de nuevos productos -->
+        <!-- Div de productos modificados -->
+        <div v-if="editTransaction.length > 0">
+          <b-card no-body class="text-center">
+            <div class="bg-warning text-light roundedBorder">
+              <h4>
+                <b>Productos a modificar: ({{ editTransaction.length }})</b>
+              </h4>
+            </div>
+          </b-card>
+          <!-- tabla productos editados -->
+          <b-table
+            striped
+            hover
+            :items="editTransaction"
+            :fields="headerLabels"
+          ></b-table>
+        </div>
+        <!-- Fin de Div de productos editados -->
+        <!-- Div de productos eliminados -->
+        <div v-if="deleteTransaction.length > 0">
+          <b-card no-body class="text-center">
+            <div class="bg-danger text-light roundedBorder">
+              <h4>
+                <b>Productos a eliminar: ({{ deleteTransaction.length }})</b>
+              </h4>
+            </div>
+          </b-card>
+          <!-- tabla productos eliminados -->
+          <b-table
+            striped
+            hover
+            :items="deleteTransaction"
+            :fields="headerLabels"
+          ></b-table>
+        </div>
+        <!-- Fin de Div de productos eliminados -->
+      </div>
+
+      <template #modal-footer="{ cancel, ok }">
+        <b-button size="m" variant="secondary" @click="cancel()">
+          Cancelar
+        </b-button>
+        <b-button size="m" variant="primary" @click="ok()"> Guardar </b-button>
       </template>
-    </b-table>
+    </b-modal>
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        fields: [
-          'id',
-          'a',
-          'b',
-          'c',
-          'd',
-          'e',
-          'f',
-          'g',
-          'h',
-          'i',
-          'j',
-          'k',
-          'l'
-        ],
-        items: [
-          { id: 1, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 2, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 3, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 4, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 5, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 6, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 7, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 8, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 9, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 },
-          { id: 10, a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7, i: 8, j: 9, k: 10, l: 11 }
-        ]
-      }
-    }
-  }
+import { mapState } from "vuex";
+
+export default {
+  name: "AgregarProd",
+  data() {
+    return {
+      headerLabels: [
+        { key: "upc", label: "UPC" },
+        { key: "nombreProd", label: "Nombre" },
+        { key: "nombreMarca", label: "Marca" },
+        { key: "nombreCategoria", label: "Categoria" },
+        { key: "precioUnit", label: "Precio unitario" },
+        { key: "descripcion", label: "Descripcion" },
+        { key: "stockProd", label: "Stock" },
+      ],
+    };
+  },
+  computed: {
+    ...mapState("productos", [
+      "newProd",
+      "deleteTransaction",
+      "editTransaction",
+    ]),
+    filteredArrayNewProd() {
+      let cachedProd = JSON.parse(JSON.stringify(this.newProd));
+      return cachedProd.filter((prod) => {
+        let state = prod.state;
+        delete prod.format;
+        delete prod.activoProd;
+        delete prod.state;
+        return state;
+      });
+    },
+  },
+};
 </script>
+<style scoped>
+::v-deep .modal-dialog {
+  max-width: 100% !important;
+  height: 100%;
+  margin: 0;
+  padding: 0 !important;
+
+  overflow-y: initial !important;
+}
+
+::v-deep .modal-content {
+  height: 100% !important;
+}
+::v-deep .modal-body {
+  height: 80vh;
+  overflow-y: auto;
+}
+::v-deep .bg-success {
+  background-image: radial-gradient(
+    circle farthest-corner at 50.4% 50.5%,
+    #0eae57 0%,
+    rgb(0 123 57) 90%
+  );
+}
+::v-deep .modal-header {
+  box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
+}
+::v-deep .modal-footer {
+  box-shadow: 0.125rem -0.8rem 20px 0px rgb(0 0 0 / 10%);
+}
+::v-deep .modal-title {
+  padding-left: 2.5rem;
+}
+::v-deep .bg-warning {
+  background-image: radial-gradient(
+    circle farthest-corner at 50.4% 50.5%,
+    #ff7600fd 0%,
+    #c34600 90%
+  );
+}
+::v-deep .bg-danger {
+  background-image: radial-gradient(
+    circle farthest-corner at 50.4% 50.5%,
+    rgb(255 0 0) 0%,
+    #870223 90%
+  );
+}
+.roundedBorder {
+  border-radius: calc(1rem - 1px) calc(1rem - 1px) 0 0;
+}
+</style>

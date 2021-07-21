@@ -7,7 +7,7 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Productos
             </h6>
-            <b-button variant="success" v-on:click="addProd()">
+            <b-button variant="success" v-on:click="addProd(tab)">
               <i class="fa fa-plus" aria-hidden="true"></i>
             </b-button>
           </div>
@@ -28,9 +28,10 @@
                 style="width: 50%; display: inline"
               />
               <b-button
-                variant="warning"
-                v-on:click="addProd()"
+              v-b-modal.verifyModifications
+                variant="success"
                 style="float: right"
+                v-if="applyChanges"
               >
                 Aplicar Cambios
               </b-button>
@@ -45,7 +46,7 @@
                 >{{ cat.nombreCat }}</b-nav-item
               >
             </b-nav>
-
+            <!-- Tabla para nuevos productos -->
             <table class="table card-text table-hover">
               <thead>
                 <tr>
@@ -75,6 +76,8 @@
                       v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.upc"
                       class="form-control font-weight-bold"
+                      :class="{ borderDanger: prod.format.upc }"
+                      :readonly="prod.state === 1"
                     />
                   </th>
                   <td>
@@ -83,6 +86,8 @@
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreProd"
                       class="form-control"
+                      :class="{ borderDanger: prod.format.nombreProd }"
+                      :readonly="prod.state === 1"
                     />
                   </td>
                   <td>
@@ -91,6 +96,8 @@
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreMarca"
                       class="form-control"
+                      :class="{ borderDanger: prod.format.nombreMarca }"
+                      :readonly="prod.state === 1"
                     />
                   </td>
                   <td>
@@ -99,6 +106,8 @@
                       v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.precioUnit"
                       class="form-control"
+                      :class="{ borderDanger: prod.format.precioUnit }"
+                      :readonly="prod.state === 1"
                     />
                   </td>
                   <td>
@@ -107,6 +116,7 @@
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.descripcion"
                       class="form-control"
+                      :readonly="prod.state === 1"
                     />
                   </td>
                   <td>
@@ -115,19 +125,37 @@
                       v-autowidth="{ maxWidth: '60px', minWidth: '10px' }"
                       v-model="prod.stockProd"
                       class="form-control"
+                      :class="{ borderDanger: prod.format.stockProd }"
+                      :readonly="prod.state === 1"
                     />
                   </td>
                   <td>
                     <button
                       type="button"
-                      @click="removeRegistro(prod)"
+                      @click="saveNewProduct(index)"
+                      class="btn btn-outline-success btn-circle"
+                      v-if="prod.state === 2 || prod.state === 0"
+                    >
+                      <i class="fas fa-save" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      @click="editNewRegistro(index)"
+                      class="btn btn-outline-warning btn-circle"
+                      v-if="prod.state === 1"
+                    >
+                      <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      @click="removeNewRegistro(index)"
                       class="btn btn-outline-danger btn-circle"
                     >
                       <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                   </td>
                 </tr>
-                <!-- ----------------------------------------------------------------------- -->
+                <!-- --------------- Tabla de productos ---------------- -->
                 <tr
                   v-for="(prod, index) in productos"
                   v-show="
@@ -135,11 +163,12 @@
                     prod.nombreCategoria === tab &&
                     prod.activoProd
                   "
-                  :key="index"
+                  :key="prod.upc"
                   :class="{
                     editing: prod === editedProd,
                     editRow: prod === editedProd,
                     editedRow: prod.saved,
+                    deleteRow: prod.delete,
                   }"
                 >
                   <th>
@@ -204,6 +233,7 @@
                         type="button"
                         @click="editProd(prod)"
                         class="btn btn-outline-warning btn-circle"
+                        v-if="!prod.delete"
                       >
                         <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                       </button>
@@ -211,10 +241,17 @@
                         type="button"
                         @click="removeRegistro(prod)"
                         class="btn btn-outline-danger btn-circle"
-                        data-toggle="modal"
-                        data-target="#eliminarProducto"
+                        v-if="!prod.delete"
                       >
                         <i class="fas fa-times" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        @click="transactionRemove(prod)"
+                        class="btn btn-outline-danger btn-circle"
+                        v-if="prod.delete"
+                      >
+                        <i class="fas fa-undo" aria-hidden="true"></i>
                       </button>
                     </div>
                     <div class="edit">
@@ -229,8 +266,6 @@
                         type="button"
                         @click="undoEditProd()"
                         class="btn btn-outline-danger btn-circle"
-                        data-toggle="modal"
-                        data-target="#eliminarProducto"
                       >
                         <i class="fas fa-undo" aria-hidden="true"></i>
                       </button>
@@ -242,7 +277,7 @@
           </div>
         </div>
       </div>
-      <AgregarProd v-if="false"></AgregarProd>
+      <AgregarProd></AgregarProd>
     </div>
   </div>
 </template>
@@ -262,7 +297,6 @@ export default {
       searchDisplay: "",
       urlApi: `http://localhost:8080/categoria`,
       tab: "",
-      newProd: [],
       catActivas: [],
     };
   },
@@ -273,6 +307,11 @@ export default {
       "editProd",
       "saveEditProd",
       "undoEditProd",
+      "transactionRemove",
+      "addProd",
+      "removeNewRegistro",
+      "saveNewProduct",
+      "editNewRegistro",
     ]),
 
     filtro(valor) {
@@ -286,28 +325,6 @@ export default {
       ).toUpperCase();
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
-    addProd() {
-      var producto = {
-        nombreProd: "",
-        activoProd: true,
-        descripcion: "",
-        precioUnit: null,
-        stockProd: null,
-        upc: null,
-        nombreMarca: "",
-        nombreCategoria: this.tab,
-        edit: false,
-      };
-      this.newProd.push(producto);
-    },
-    inputBlankOrFilled(cadenaDeTexto) {
-      try {
-        return cadenaDeTexto.trim().length != 0;
-      } catch (error) {
-        console.log(error);
-        return true;
-      }
-    },
   },
   computed: {
     ...mapState("productos", [
@@ -315,8 +332,29 @@ export default {
       "producto",
       "cacheEditProd",
       "editedProd",
+      "newProd",
+      "deleteTransaction",
+      "editTransaction",
+      "numeroDeEditados",
     ]),
     ...mapState("categorias", ["categorias"]),
+
+    applyChanges: function () {
+      let nuevosProductos = this.newProd.filter((prod) => prod.state === 1);
+      if (nuevosProductos.length > 0) {
+        return true;
+      }
+
+      if (this.deleteTransaction.length > 0) {
+        return true;
+      }
+
+      if (this.editTransaction.length > 0) {
+        return true;
+      }
+
+      return false;
+    },
   },
   /*
     hook para inicializar los valores de la tabla
@@ -367,7 +405,7 @@ td input {
   font-size: 12px;
 }
 .deleteRow {
-  border-left: 0.5rem solid rgb(223, 75, 75);
+  border-left: 0.5rem solid #df4b4b !important;
 }
 .editRow {
   border-left: 0.5rem solid #ffc107;
@@ -384,5 +422,8 @@ td input {
 }
 .editing .view {
   display: none;
+}
+.borderDanger {
+  border-color: #dc3545 !important;
 }
 </style>
