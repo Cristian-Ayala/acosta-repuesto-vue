@@ -28,7 +28,7 @@
                 style="width: 50%; display: inline"
               />
               <b-button
-              v-b-modal.verifyModifications
+                v-b-modal.verifyModifications
                 variant="success"
                 style="float: right"
                 v-if="applyChanges"
@@ -183,6 +183,13 @@
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreProd"
                       class="form-control edit"
+                      :class="
+                        prod.format
+                          ? prod.format.nombreProd
+                            ? 'borderDanger'
+                            : ''
+                          : ''
+                      "
                     />
                   </td>
                   <td>
@@ -194,6 +201,13 @@
                       v-autowidth="{ maxWidth: '150px', minWidth: '10px' }"
                       v-model="prod.nombreMarca"
                       class="form-control edit"
+                      :class="
+                        prod.format
+                          ? prod.format.nombreMarca
+                            ? 'borderDanger'
+                            : ''
+                          : ''
+                      "
                     />
                   </td>
                   <td>
@@ -203,6 +217,13 @@
                       v-autowidth="{ maxWidth: '100px', minWidth: '10px' }"
                       v-model="prod.precioUnit"
                       class="form-control edit"
+                      :class="
+                        prod.format
+                          ? prod.format.precioUnit
+                            ? 'borderDanger'
+                            : ''
+                          : ''
+                      "
                     />
                   </td>
                   <td>
@@ -225,13 +246,20 @@
                       v-autowidth="{ maxWidth: '60px', minWidth: '10px' }"
                       v-model="prod.stockProd"
                       class="form-control edit"
+                      :class="
+                        prod.format
+                          ? prod.format.stockProd
+                            ? 'borderDanger'
+                            : ''
+                          : ''
+                      "
                     />
                   </td>
                   <td>
                     <div class="view">
                       <button
                         type="button"
-                        @click="editProd(prod)"
+                        @click="editProd({ prod: prod, index: index })"
                         class="btn btn-outline-warning btn-circle"
                         v-if="!prod.delete"
                       >
@@ -257,14 +285,14 @@
                     <div class="edit">
                       <button
                         type="button"
-                        @click="saveEditProd()"
+                        @click="saveEditProd(index)"
                         class="btn btn-outline-success btn-circle"
                       >
                         <i class="fas fa-save" aria-hidden="true"></i>
                       </button>
                       <button
                         type="button"
-                        @click="undoEditProd()"
+                        @click="undoEditProd(index)"
                         class="btn btn-outline-danger btn-circle"
                       >
                         <i class="fas fa-undo" aria-hidden="true"></i>

@@ -139,55 +139,7 @@ export default {
          */
         saveNewProduct(state, index) {
             let prod = state.newProd[index];
-            let errores = []
-
-            //Chequeando que el campo UPC no este vacio y sea unico entre los registros
-            if (!inputBlankOrFilled(prod.upc)) {
-                prod.format.upc = true;
-                errores.push("UPC");
-            } else if (!unicUPC(prod.upc)) {
-                prod.format.upc = true;
-                errores.push("UPC");
-            } else {
-                prod.format.upc = false;
-            }
-
-            //Verifica que el nombre del producto no este vacio
-            if (!inputBlankOrFilled(prod.nombreProd)) {
-                prod.format.nombreProd = true;
-                errores.push("Nombre del producto");
-            } else {
-                prod.format.nombreProd = false;
-            }
-
-            //Verifica que la marca no esté vacia y exista 
-            if (!inputBlankOrFilled(prod.nombreMarca)) {
-                prod.format.nombreMarca = true;
-                errores.push("Marca");
-            } else if (!marcaExist(prod.nombreMarca)) {
-                prod.format.nombreMarca = true;
-                errores.push("Marca");
-            } else {
-                prod.format.nombreMarca = false;
-            }
-
-            //Verifica que el precio unitario del producto no este vacio
-            if (!parseToDouble(prod.precioUnit)) {
-                prod.format.precioUnit = true;
-                errores.push("Precio unitario");
-            } else {
-                state.newProd[index].precioUnit = parseFloat(prod.precioUnit);
-                prod.format.precioUnit = false;
-            }
-
-            //Verifica que el stock del producto no este vacio
-            if (!parseFloat(prod.stockProd)) {
-                prod.format.stockProd = true;
-                errores.push("Stock");
-            } else {
-                state.newProd[index].stockProd = parseFloat(prod.stockProd);
-                prod.format.stockProd = false;
-            }
+            let errores = verifyFormat(state.newProd, prod, index)
 
             //Verifica que no existan problemas de formato en el nuevo registro del producto
             if (errores.length === 0) {
@@ -202,16 +154,7 @@ export default {
                     }
                 });
             } else {
-                let message = ""
-                if (errores.length === 1) {
-                    message = "El siguiente campo presenta problemas: " + errores[0]
-                } else {
-                    message = "Los siguientes campos presentas problemas: "
-                    errores.forEach((error) => {
-                        message += error + ", "
-                    });
-                    message = message.substring(0, message.length - 2) + ".";
-                }
+                let message = armarMensajeError(errores);
                 this._vm.$awn.alert(message, {
                     durations: {
                         success: 2000
@@ -284,7 +227,7 @@ export default {
         removeRegistro: function (state, producto) {
             //Verifica que no se haya editando
             //si se ha editado, lo quita del queue para persistir la edicion. Sino, no hace nada.
-            if(producto.saved){
+            if (producto.saved) {
                 var index = state.editTransaction.findIndex(
                     (element) => element.upc === producto.upc
                 );
@@ -321,7 +264,7 @@ export default {
         },
         transactionRemove(state, producto) {
             //Si el producto había sido guardado, regresa al queue de guardar
-            if(producto.saved){
+            if (producto.saved) {
                 state.editTransaction.push(producto);
             }
 
@@ -348,13 +291,8 @@ export default {
         getAll() {
             axios.get(urlApi).then(
                 response => {
-                    this.productos = response.data
-                    this.productos = this.productos.filter(prod => prod.activoProd === true);
-                    this.productos.map(prod => {
-                        prod.nombreCategoria = this.categorias.filter(cat => cat.idCategoria === prod.idCategoria)[0].nombreCat;
-                        prod.nombreMarca = this.marcas.filter(mar => mar.idMarca === prod.idMarca)[0].nombreMarca;
-                    });
-
+                    var prods = response.data;
+                    return prods;
                 }
             ).catch(ex => {
                 console.log(ex)
@@ -404,52 +342,73 @@ export default {
          * @param {state de vuex} state 
          * @param {El producto a editar} prod 
          */
-        editProd(state, prod) {
+        editProd(state, obj) {
             if (state.cacheEditProd === null) {
-                state.cacheEditProd = JSON.parse(JSON.stringify(prod));
-                state.editedProd = prod;
+                state.cacheEditProd = JSON.parse(JSON.stringify(obj.prod));
+                state.cacheEditProd.index = obj.index;
+                state.editedProd = obj.prod;
             } else {
                 this.commit("productos/undoEditProd", state)
-                this.commit("productos/editProd", prod)
+                this.commit("productos/editProd", {
+                    prod: obj.prod
+                })
             }
+        },
+        /**
+         * Regresa al valor original, cacheado antes de comenzar a editar
+         * @param {state de vuex} state 
+         */
+        undoEditProd(state, index) {
+            state.editedProd = state.cacheEditProd;
+            state.productos.splice(state.cacheEditProd.index, 1, state.cacheEditProd);
+            state.editedProd = null;
+            state.cacheEditProd = null;
         },
         /**
          * Se guardan los cambios del producto editado
          * 
          * @param {state de vuex} state 
          */
-        saveEditProd(state) {
-            var index = state.productos.findIndex(
-                (element) => element.upc === state.cacheEditProd.upc
-            );
+        saveEditProd(state, index) {
             state.editedProd.saved = true;
-            state.productos.splice(index, 1, state.editedProd);
+            let errores = verifyFormat([state.editedProd], state.editedProd, 0)
 
-            //para agregar al array de productos editados
-            let inTran = state.editTransaction.findIndex(el => el.upc === state.editedProd.upc);
-            if (inTran < 0) {
-                state.editTransaction.push(state.editedProd)
-            } else if (inTran >= 0) {
-                state.editTransaction.splice(inTran, 1, state.editedProd);
+            if (errores.length === 0) {
+                state.productos.splice(index, 1, state.editedProd);
+                //para agregar al array de productos editados
+                let inTran = state.editTransaction.findIndex(el => el.upc === state.editedProd.upc);
+                //Si no está en el arreglo lo agrega
+                if (inTran < 0) {
+                    state.editTransaction.push(state.editedProd)
+                    //Si ya existe el producto en el arreglo, lo vuelve a modificar
+                } else if (inTran >= 0) {
+                    state.editTransaction.splice(inTran, 1, state.editedProd);
+                }
+                //FINAL para agregar al array de productos editados
+                state.editedProd = null;
+                state.cacheEditProd = null;
+                //Notificacion si todo va bien
+                this._vm.$awn.success('Formato correcto.', {
+                    durations: {
+                        success: 2000
+                    },
+                    labels: {
+                        success: "Exito"
+                    }
+                });
+            } else {
+                //For re-rendering
+                let upc = state.editedProd.upc;
+                state.editedProd.upc= 0;
+                state.editedProd.upc= upc;
+                //Finish re-rendering
+                let message = armarMensajeError(errores);
+                this._vm.$awn.alert(message, {
+                    durations: {
+                        success: 2000
+                    }
+                });
             }
-            //FINAL para agregar al array de productos editados
-
-            state.editedProd = null;
-            state.cacheEditProd = null;
-        },
-        /**
-         * Regresa al valor original, cacheado antes de comenzar a editar
-         * @param {vuex state} state 
-         */
-        undoEditProd(state) {
-            var index = state.productos.findIndex(
-                (element) => element.upc === state.cacheEditProd.upc
-            );
-            // console.log(index);
-            state.productos.splice(index, 1, state.cacheEditProd);
-            state.editedProd = state.cacheEditProd;
-            state.editedProd = null;
-            state.cacheEditProd = null;
         },
     }
 }
@@ -475,13 +434,94 @@ function inputBlankOrFilled(text) {
 }
 
 function marcaExist(text) {
+    if (text) {
+        return true
+    }
     //console.log(text);
     //para ver si la marca existe
     return true
 }
 
 function unicUPC(upc) {
-    //console.log(upc);
+    if (upc) {
+        return true
+    } //console.log(upc);
     //verifica que el upc sea unico
     return true
+}
+
+function verifyFormat(arrProd, prod, index) {
+    let errores = []
+    if (!prod.format) {
+        prod.format = {};
+    }
+    //Chequeando que el campo UPC no este vacio y sea unico entre los registros
+    if (!prod.saved) {
+        if (!inputBlankOrFilled(prod.upc)) {
+            prod.format.upc = true;
+            errores.push("UPC");
+        } else if (!unicUPC(prod.upc)) {
+            prod.format.upc = true;
+            errores.push("UPC");
+        } else {
+            prod.format.upc = false;
+        }
+    }
+
+    //Verifica que el nombre del producto no este vacio
+    if (!inputBlankOrFilled(prod.nombreProd)) {
+        prod.format.nombreProd = true;
+        errores.push("Nombre del producto");
+    } else {
+        prod.format.nombreProd = false;
+    }
+
+    //Verifica que la marca no esté vacia y exista 
+    if (!inputBlankOrFilled(prod.nombreMarca)) {
+        prod.format.nombreMarca = true;
+        errores.push("Marca");
+    } else if (!marcaExist(prod.nombreMarca)) {
+        prod.format.nombreMarca = true;
+        errores.push("Marca");
+    } else {
+        prod.format.nombreMarca = false;
+    }
+
+    //Verifica que el precio unitario del producto no este vacio
+    if (!parseToDouble(prod.precioUnit)) {
+        prod.format.precioUnit = true;
+        errores.push("Precio unitario");
+    } else {
+        arrProd[index].precioUnit = parseFloat(prod.precioUnit);
+        prod.format.precioUnit = false;
+    }
+
+    //Verifica que el stock del producto no este vacio
+    if (!parseFloat(prod.stockProd)) {
+        prod.format.stockProd = true;
+        errores.push("Stock");
+    } else {
+        arrProd[index].stockProd = parseFloat(prod.stockProd);
+        prod.format.stockProd = false;
+    }
+
+    if (errores.length > 0) {
+        prod.saved = false;
+    }
+
+    return errores;
+}
+
+function armarMensajeError(errores) {
+    let message = ""
+    if (errores.length === 1) {
+        message = "El siguiente campo presenta problemas: " + errores[0]
+    } else {
+        message = "Los siguientes campos presentas problemas: "
+        errores.forEach((error) => {
+            message += error + ", "
+        });
+        message = message.substring(0, message.length - 2) + ".";
+    }
+    return message;
 }

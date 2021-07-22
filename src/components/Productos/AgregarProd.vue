@@ -62,7 +62,7 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="ok()"> Guardar </b-button>
+        <b-button size="m" variant="primary" @click="ok()"> Efectuar Cambios </b-button>
       </template>
     </b-modal>
   </div>
@@ -99,7 +99,7 @@ export default {
         delete prod.format;
         delete prod.activoProd;
         delete prod.state;
-        return state;
+        return state === 1;
       });
     },
   },
