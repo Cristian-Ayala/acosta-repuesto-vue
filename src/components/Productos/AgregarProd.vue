@@ -62,14 +62,23 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="ok()"> Efectuar Cambios </b-button>
+        <b-button
+          size="m"
+          variant="primary"
+          @click="
+            ok();
+            applyAllChanges();
+          "
+        >
+          Efectuar Cambios
+        </b-button>
       </template>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "AgregarProd",
@@ -85,6 +94,9 @@ export default {
         { key: "stockProd", label: "Stock" },
       ],
     };
+  },
+  methods: {
+    ...mapMutations("productos", ["applyAllChanges"]),
   },
   computed: {
     ...mapState("productos", [

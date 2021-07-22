@@ -5,22 +5,18 @@ export default {
     namespaced: true,
     state: {
         productos: [{
-                idMarca: 0,
                 nombreProd: "20W50",
                 activoProd: true,
                 descripcion: "Lubricante para motos",
-                idCategoria: 3,
                 precioUnit: 5,
                 stockProd: 100,
                 upc: 53260,
                 nombreMarca: "Motul",
                 nombreCategoria: "Lubricantes"
             }, {
-                idMarca: 1,
                 nombreProd: "System 7 Blanco",
                 activoProd: true,
                 descripcion: "Carcasa completa de carbono",
-                idCategoria: 1,
                 precioUnit: 57.99,
                 stockProd: 16,
                 upc: 37842,
@@ -28,11 +24,9 @@ export default {
                 nombreCategoria: "Cascos"
             },
             {
-                idMarca: 2,
                 nombreProd: "22 pulgadas",
                 activoProd: true,
                 descripcion: "Llantas para motos",
-                idCategoria: 3,
                 precioUnit: 24.50,
                 stockProd: 7,
                 upc: 23471,
@@ -358,7 +352,7 @@ export default {
          * Regresa al valor original, cacheado antes de comenzar a editar
          * @param {state de vuex} state 
          */
-        undoEditProd(state, index) {
+        undoEditProd(state) {
             state.editedProd = state.cacheEditProd;
             state.productos.splice(state.cacheEditProd.index, 1, state.cacheEditProd);
             state.editedProd = null;
@@ -399,8 +393,8 @@ export default {
             } else {
                 //For re-rendering
                 let upc = state.editedProd.upc;
-                state.editedProd.upc= 0;
-                state.editedProd.upc= upc;
+                state.editedProd.upc = 0;
+                state.editedProd.upc = upc;
                 //Finish re-rendering
                 let message = armarMensajeError(errores);
                 this._vm.$awn.alert(message, {
@@ -409,6 +403,32 @@ export default {
                     }
                 });
             }
+        },
+        applyAllChanges(state) {
+            let nuevosProductos = filteredArrayNewProd(state.newProd);
+            if (nuevosProductos.length != 0) {
+                state.productos.push(...nuevosProductos)
+            }
+            let modifyProducts = filterModifyFields(state.editTransaction);
+            if (modifyProducts.length != 0) {
+                modifyProducts.map((prod) => {
+                    let index = state.productos.findIndex((obj) => obj.upc === prod.upc);
+                    state.productos.splice(index, 1, prod);
+                });
+                //Funcion para el endpoint y los productos a editar
+            }
+            let deleteProducts = filterDelete(state.deleteTransaction);
+            if (deleteProducts.length != 0) {
+                deleteProducts.map((prod) => {
+                    let index = state.productos.findIndex((obj) => obj.upc === prod.upc);
+                    state.productos.splice(index, 1);
+                });
+                //Funcion para el endpoint y los productos a eliminar
+            }
+            //limpiar arrays que contienen el queue de acciones
+            state.newProd = [];
+            state.editTransaction = []
+            state.deleteTransaction = []
         },
     }
 }
@@ -524,4 +544,31 @@ function armarMensajeError(errores) {
         message = message.substring(0, message.length - 2) + ".";
     }
     return message;
+}
+
+function filteredArrayNewProd(newProd) {
+    return newProd.filter((prod) => {
+        if (prod.state === 1) {
+            delete prod.format;
+            delete prod.state;
+            return true;
+        }
+        return false;
+    });
+}
+
+function filterModifyFields(modifyProds) {
+    return modifyProds.filter((prod) => {
+        delete prod.format;
+        delete prod.saved;
+    });
+}
+
+function filterDelete(deleteProds) {
+    return deleteProds.filter((prod) => {
+        delete prod.format;
+        delete prod.saved;
+        delete prod.delete;
+        return true;
+    });
 }

@@ -292,7 +292,7 @@
                       </button>
                       <button
                         type="button"
-                        @click="undoEditProd(index)"
+                        @click="undoEditProd()"
                         class="btn btn-outline-danger btn-circle"
                       >
                         <i class="fas fa-undo" aria-hidden="true"></i>
