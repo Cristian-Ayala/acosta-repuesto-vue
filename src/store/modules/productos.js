@@ -405,9 +405,15 @@ export default {
             }
         },
         applyAllChanges(state) {
+            var message = ""; //Mensaje de notificación
             let nuevosProductos = filteredArrayNewProd(state.newProd);
-            if (nuevosProductos.length != 0) {
+            if (nuevosProductos.length > 0) {
                 state.productos.push(...nuevosProductos)
+                if (nuevosProductos.length == 1) {
+                    message += "- Se agregó 1 producto nuevo.<br>"
+                } else {
+                    message += `- Se agregaron ${nuevosProductos.length} productos.<br>`;
+                }
             }
             let modifyProducts = filterModifyFields(state.editTransaction);
             if (modifyProducts.length != 0) {
@@ -416,15 +422,35 @@ export default {
                     state.productos.splice(index, 1, prod);
                 });
                 //Funcion para el endpoint y los productos a editar
+
+                if (modifyProducts.length == 1) {
+                    message += "\n- Se modificó 1 producto.<br>"
+                } else {
+                    message += `- Se modificaron ${modifyProducts.length} productos.<br>`;
+                }
             }
             let deleteProducts = filterDelete(state.deleteTransaction);
-            if (deleteProducts.length != 0) {
+            if (deleteProducts.length > 0) {
                 deleteProducts.map((prod) => {
                     let index = state.productos.findIndex((obj) => obj.upc === prod.upc);
                     state.productos.splice(index, 1);
                 });
                 //Funcion para el endpoint y los productos a eliminar
+
+                if (deleteProducts.length == 1) {
+                    message += "\n- Se eliminó 1 producto.<br>"
+                } else {
+                    message += `- Se eliminaron ${deleteProducts.length} productos.<br>`;
+                }
             }
+            this._vm.$awn.success(message, {
+                durations: {
+                    success: 2000
+                },
+                labels: {
+                    success: "Exito"
+                }
+            });
             //limpiar arrays que contienen el queue de acciones
             state.newProd = [];
             state.editTransaction = []
@@ -561,6 +587,7 @@ function filterModifyFields(modifyProds) {
     return modifyProds.filter((prod) => {
         delete prod.format;
         delete prod.saved;
+        return true;
     });
 }
 
