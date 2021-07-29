@@ -117,18 +117,7 @@ export default {
             cantidad: 0,
             descuento: 0
         }],
-        metPago: [{
-                nombrePago: "Tarjeta de Crédito",
-                idMetodoPago: 0
-            },
-            {
-                nombrePago: "Tarjeta de Débito",
-                idMetodoPago: 1
-            }, {
-                nombrePago: "Efectivo",
-                idMetodoPago: 2
-            }
-        ],
+        metPago: [{"name":"Tarjeta de Crédito"}, {"name":"Tarjeta de Débito"}, {"name":"Efectivo"}, {"name":"Credito Fiscal"},{"name":"Criptomoneda"}],
         metPagoSelected: "",
         detalleOrden: [],
         activaOrd: [],
@@ -359,8 +348,10 @@ export default {
             let array = (this.ordenes[valor].idOrden + this.ordenes[valor].observacionesOrden + this.ordenes[valor].totalOrden + this.ordenes[valor].nombreCliente).toUpperCase();
             return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
         },
-        filtroProd(valor) {
-            if (this.prodSearch === "") return true;
+        filtroProd(state,valor) {
+            let x=0;
+            if (x == 0) return true;
+            if (state.prodSearch === "") return true;
             let array = (this.marcas.filter(mar => mar.idMarca === this.productos[valor].idMarca)[0].nombreMarca + this.categorias.filter(cat => cat.idCategoria === this.productos[valor].idCategoria)[0].nombreCat + this.productos[valor].nombreProd + this.productos[valor].descripcion + this.productos[valor].precioUnit + this.productos[valor].stockProd + this.productos[valor].upc).toUpperCase();
             return array.indexOf(this.prodSearch.toUpperCase()) >= 0;
         },

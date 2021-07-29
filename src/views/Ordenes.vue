@@ -7,15 +7,12 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Ordenes
             </h6>
-            <button
-              type="button"
-              class="btn btn-success"
+            <b-button
+              v-b-modal.nuevaOrden
+              variant="success"
               style="float: right"
-              data-toggle="modal"
-              data-target="#agregarProducto"
-            >
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </button>
+              ><i class="fa fa-plus" aria-hidden="true"></i
+            ></b-button>
           </div>
           <div class="card-body">
             <div class="form-group position-relative mb-0">
@@ -87,15 +84,18 @@
     </div>
     <!-- Fin del Cuerpo a escribir -->
     <DetalleOrden></DetalleOrden>
+    <NuevaOrden></NuevaOrden>
   </div>
 </template>
 <script>
 import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
+import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
 import { mapState, mapMutations } from "vuex";
 export default {
   name: "Ordenes",
   components: {
     DetalleOrden,
+    NuevaOrden,
   },
   data: () => {
     return {
@@ -117,7 +117,7 @@ export default {
     },
   },
   computed: {
-    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd"]),
+    ...mapState("ordenes", ["ordenes", "ordSelected", "showDetOrd",]),
   },
 };
 </script>
