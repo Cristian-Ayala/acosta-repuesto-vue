@@ -305,19 +305,19 @@
           </div>
         </div>
       </div>
-      <AgregarProd></AgregarProd>
+      <ConfirmarTransacciones></ConfirmarTransacciones>
     </div>
   </div>
 </template>
 
 <script>
-import AgregarProd from "@/components/Productos/AgregarProd.vue";
+import ConfirmarTransacciones from "@/components/Productos/ConfirmarTransacciones.vue";
 import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "Productos",
   components: {
-    AgregarProd,
+    ConfirmarTransacciones,
   },
   data: () => {
     return {

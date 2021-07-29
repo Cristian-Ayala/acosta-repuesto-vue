@@ -81,7 +81,7 @@
 import { mapState, mapMutations } from "vuex";
 
 export default {
-  name: "AgregarProd",
+  name: "ConfirmarTransacciones",
   data() {
     return {
       headerLabels: [

@@ -59,14 +59,16 @@
         </router-link>
       </div>
       <div class="cuadro4-home">
-        <img src="/img/4.png" alt="..." style="max-width: 100%" />
-        <div
-          class="font-weight-bold d-block"
-          style="margin: 1rem; font-size: 2.5rem"
-        >
-          Ordenes
-        </div>
-        <div class="cuadros-text-home">Eliminar, agregar o listar</div>
+        <router-link to="/ordenes">
+          <img src="/img/4.png" alt="..." style="max-width: 100%" />
+          <div
+            class="font-weight-bold d-block"
+            style="margin: 1rem; font-size: 2.5rem"
+          >
+            Ordenes
+          </div>
+          <div class="cuadros-text-home">Eliminar, agregar o listar</div>
+        </router-link>
       </div>
     </div>
   </div>

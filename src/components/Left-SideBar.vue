@@ -57,12 +57,18 @@
           <i class="fas fa-boxes mr-3 text-gray my-2"></i><span>Productos</span>
         </a>
       </router-link>
-      <li class="sidebar-list-item">
-        <a href="ordenes.html" class="sidebar-link text-muted">
-          <i class="fas fa-clipboard-check mr-4 text-gray my-2"></i
-          ><span>Ordenes</span>
+      <router-link
+        tag="a"
+        to="/ordenes"
+        class="sidebar-link text-muted sidebar-list-item"
+        v-slot="{ href, navigate }"
+        custom
+        :class="this.$route.path === '/ordenes' ? 'active' : ''"
+      >
+        <a :href="href" @click="navigate">
+          <i class="fas fa-clipboard-check mr-3 text-gray my-2"></i><span>Ordenes</span>
         </a>
-      </li>
+      </router-link>
     </ul>
   </div>
 </template>
