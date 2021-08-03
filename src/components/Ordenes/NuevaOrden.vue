@@ -22,7 +22,7 @@
 	c0.529-0.917,0.214-2.095-0.704-2.624c-0.292-0.169-0.623-0.258-0.959-0.258c-0.686,0-1.323,0.368-1.655,0.943L7.161,8.511H2.574
 	C1.155,8.511,0,9.667,0,11.086v1.47c0,1.274,0.934,2.525,2.152,2.728l1.931,11.042c0.03,1.394,1.173,2.519,2.573,2.519h18.605
 	c1.401,0,2.545-1.125,2.574-2.52l1.921-11.032C31.019,15.128,32,13.862,32,12.556v-1.47C32,9.667,30.845,8.511,29.426,8.511z
-	 M26.615,26.167l-0.009,0.104c0,0.741-0.604,1.344-1.345,1.344H6.656c-0.741,0-1.344-0.603-1.344-1.344L3.407,15.327h25.096
+	M26.615,26.167l-0.009,0.104c0,0.741-0.604,1.344-1.345,1.344H6.656c-0.741,0-1.344-0.603-1.344-1.344L3.407,15.327h25.096
 	L26.615,26.167z M30.77,12.556c0,0.74-0.603,1.541-1.344,1.541H2.574c-0.741,0-1.344-0.8-1.344-1.541v-1.47
 	c0-0.741,0.603-1.344,1.344-1.344h5.271l3.113-5.011c0.184-0.318,0.623-0.439,0.944-0.253c0.33,0.19,0.444,0.614,0.268,0.92
 	L9.396,9.742h12.467l-2.76-4.32c-0.189-0.33-0.076-0.753,0.253-0.944c0.323-0.186,0.756-0.074,0.955,0.27l3.104,4.994h6.011
@@ -51,7 +51,11 @@
       <div class="cuerpoModal">
         <div class="sideBarMenu">
           <b-list-group style="max-width: 13rem">
-            <b-list-group-item class="d-flex align-items-center" :class="{'tabSelected': paso ==='datos'}" @click="paso='datos'">
+            <b-list-group-item
+              class="d-flex align-items-center"
+              :class="{ tabSelected: paso === 'datos' }"
+              @click="paso = 'datos'"
+            >
               <b-avatar variant="success" class="mr-3">
                 <svg
                   viewBox="50 100 300 300"
@@ -72,7 +76,11 @@
               </b-avatar>
               <span class="mr-auto">Datos Personales</span>
             </b-list-group-item>
-            <b-list-group-item class="d-flex align-items-center" :class="{'tabSelected': paso ==='productos'}" @click="paso='productos'">
+            <b-list-group-item
+              class="d-flex align-items-center"
+              :class="{ tabSelected: paso === 'productos' }"
+              @click="paso = 'productos'"
+            >
               <b-avatar variant="success" class="mr-3">
                 <svg
                   viewBox="7 7 16 16"
@@ -93,7 +101,11 @@
               </b-avatar>
               <span class="mr-auto">Agregar Productos</span>
             </b-list-group-item>
-            <b-list-group-item class="d-flex align-items-center" :class="{'tabSelected': paso ==='resumen'}" @click="paso='resumen'">
+            <b-list-group-item
+              class="d-flex align-items-center"
+              :class="{ tabSelected: paso === 'resumen' }"
+              @click="paso = 'resumen'"
+            >
               <b-avatar variant="success" class="mr-3">
                 <svg
                   viewBox="7 7 16 16"
@@ -118,35 +130,119 @@
         </div>
         <div class="bodyMenu">
           <div class="datosPersonales">
-            <b-form inline>
-              <label for="nombre"
-                >Nombre:&nbsp;&nbsp;&nbsp;
-              </label>
-              <b-form-input
-                id="nombre"
-                class="mb-2 mr-sm-2 mb-sm-0"
-                v-model="orden.nombreCliente"
-              ></b-form-input>
-
-              <label for="tel"
-                >Teléfono:&nbsp;&nbsp;&nbsp;
-              </label>
-              <b-form-input
-                id="tel"
-                class="mb-2 mr-sm-2 mb-sm-0"
-                v-model="orden.telefono"
-              ></b-form-input>
+            <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
+              <label for="fecha">Fecha de venta:&nbsp;&nbsp;&nbsp; </label>
+              <date-pick
+                id="fecha"
+                v-model="date"
+                :inputAttributes="{ readonly: true }"
+                :pickTime="true"
+                :use12HourClock="true"
+                :format="'DD-MM-YYYY HH:mm'"
+                :displayFormat="'DD-MM-YYYY H:mm A'"
+                :selectableYearRange="{ from: 2020, to: 2030 }"
+              ></date-pick>
             </b-form>
+            <b-form class="justifySpace" inline>
+              <div>
+                <label for="nombre">Nombre:&nbsp;&nbsp;&nbsp; </label>
+                <b-form-input
+                  id="nombre"
+                  class="mb-2 mr-sm-2 mb-sm-0"
+                  v-model="orden.nombreCliente"
+                ></b-form-input>
+              </div>
+              <div>
+                <label for="tel">Teléfono:&nbsp;&nbsp;&nbsp; </label>
+                <b-form-input
+                  id="tel"
+                  class="mb-2 mr-sm-2 mb-sm-0"
+                  v-model="orden.telefono"
+                ></b-form-input>
+              </div>
+            </b-form>
+            <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
+              <div>
+                <label for="tipoOrdenDropDown"
+                  >Tipo de orden:&nbsp;&nbsp;&nbsp;
+                </label>
+                <dropdown
+                  id="tipoOrdenDropDown"
+                  class="dropdown"
+                  :options="tipoOrdenArray"
+                  :selected="tipoOrden"
+                  v-on:updateOption="tipoOrdenMethod"
+                  :placeholder="'Público'"
+                  :closeOnOutsideClick="true"
+                >
+                </dropdown>
+              </div>
+            </b-form>
+            <div>
+              <blockquote>
+                <p><b>Público:</b> Todos los clientes.</p>
+
+                <p>
+                  <b>Mayorista:</b> Cuando la compra de productos excede lo
+                  normal.
+                </p>
+
+                <p>
+                  <b>Taller:</b> Cuando un taller asociado realiza una compra.
+                </p>
+              </blockquote>
+            </div>
           </div>
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
-        <b-button size="m" variant="secondary" @click="cancel()">
+        <b-button
+          size="m"
+          variant="secondary"
+          @click="cancel()"
+          v-if="paso === 'datos'"
+        >
           Cancelar
         </b-button>
-        <b-button size="m" variant="success" @click="ok()">
-          <!-- @Click="createRegistro" -->
-          Efectuar Cambios
+        <b-button
+          size="m"
+          variant="warning"
+          @click="paso = 'datos'"
+          v-if="paso === 'productos'"
+        >
+        Atras
+        </b-button>
+        <b-button
+          size="m"
+          variant="warning"
+          @click="paso = 'productos'"
+          v-if="paso === 'resumen'"
+        >
+          Atras
+        </b-button>
+        <b-button
+          size="m"
+          variant="success"
+          @click="paso = 'productos'"
+          v-if="paso === 'datos'"
+        >
+          Siguiente
+        </b-button>
+        <b-button
+          size="m"
+          variant="success"
+          @click="paso = 'resumen'"
+          v-if="paso === 'productos'"
+        >
+          Yo momma
+        </b-button>
+        <b-button
+          size="m"
+          variant="success"
+          @click="ok();paso = 'datos'"
+          v-if="paso === 'resumen'"
+        >
+          Confirmar
         </b-button>
       </template>
     </b-modal>
@@ -154,12 +250,14 @@
 </template>
 <script>
 import dropdown from "vue-dropdowns";
+import DatePick from "@/components/Calendario/vueDatePick.vue";
 import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "NuevaOrden",
   components: {
     dropdown,
+    DatePick,
   },
   data() {
     return {
@@ -186,6 +284,21 @@ export default {
         name: "Efectivo",
       },
       paso: "datos",
+      date: "20-01-2021 14:30",
+      tipoOrdenArray: [
+        {
+          name: "Público",
+        },
+        {
+          name: "Mayoreo",
+        },
+        {
+          name: "Taller",
+        },
+      ],
+      tipoOrden: {
+        name: "Público",
+      },
     };
   },
   methods: {
@@ -198,14 +311,30 @@ export default {
       "dosDecimalesProd",
     ]),
     methodToRunOnSelect(payload) {
+      console.log("hola");
       this.object = payload;
+    },
+    tipoOrdenMethod(payload) {
+      this.tipoOrden = payload;
     },
   },
   computed: {
     ...mapState("ordenes", ["ordSelected", "showDetOrd", "orden", "metPago"]),
     ...mapState("productos", ["productos"]),
   },
+  mounted() {
+    this.date = todayDate();
+  },
 };
+function todayDate() {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  var yyyy = today.getFullYear();
+  var horas = today.getHours();
+  var minutos = today.getMinutes();
+  return `${dd}-${mm}-${yyyy} ${horas}:${minutos}`;
+}
 </script>
 
 <style scoped>
@@ -273,6 +402,7 @@ export default {
 .sideBarMenu {
   display: inline-flex;
   height: 100%;
+  width: 13rem;
   align-items: center;
   padding: 0;
   margin: 0;
@@ -281,6 +411,10 @@ export default {
 }
 .bodyMenu {
   display: inline-block;
+  height: 100%;
+  width: calc(100% - 13rem);
+  vertical-align: top;
+  position: relative;
 }
 .tabSelected {
   transition: 0.1s ease-in-out all !important;
@@ -288,6 +422,44 @@ export default {
 }
 .datosPersonales {
   padding-left: 2rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+}
+::v-deep .vdpComponent input[type="text"] {
+  text-align: center;
+  font-size: medium;
+  font-family: revert;
+  /* font-weight: bold; */
+  padding: 0.4rem 0.8rem;
+  line-height: 1.5;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 2rem;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+}
+.justifySpace {
+  justify-content: space-between;
+  width: 100%;
+}
+.fechaForm {
+  float: right;
+  margin: 1rem;
+}
+.dropdown {
+  text-align: center;
+}
+blockquote {
+  color: rgba(0, 0, 0, 0.5);
+  padding-left: 1.5em;
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
 }
 /* Fin del body del modal */
 </style>
