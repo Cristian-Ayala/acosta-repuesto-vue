@@ -129,7 +129,7 @@
           </b-list-group>
         </div>
         <div class="bodyMenu">
-          <div class="datosPersonales">
+          <div class="datosPersonales" v-if="paso === 'datos'">
             <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
               <label for="fecha">Fecha de venta:&nbsp;&nbsp;&nbsp; </label>
               <date-pick
@@ -193,6 +193,7 @@
               </blockquote>
             </div>
           </div>
+          <div class="selProductos" v-if="paso === 'productos'"></div>
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
@@ -234,7 +235,7 @@
           @click="paso = 'resumen'"
           v-if="paso === 'productos'"
         >
-          Yo momma
+          Siguiente
         </b-button>
         <b-button
           size="m"
@@ -460,6 +461,9 @@ blockquote {
   color: rgba(0, 0, 0, 0.5);
   padding-left: 1.5em;
   border-left: 5px solid rgba(0, 0, 0, 0.1);
+}
+.selProductos{
+  display: contents;
 }
 /* Fin del body del modal */
 </style>
