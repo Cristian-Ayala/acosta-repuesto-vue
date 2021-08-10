@@ -193,7 +193,55 @@
               </blockquote>
             </div>
           </div>
-          <div class="selProductos" v-if="paso === 'productos'"></div>
+          <div class="selProductos" v-show="paso === 'productos'">
+            <input type="search" placeholder="Buscar" v-model="buscar" />
+            <vue-good-table
+            title="Agrega Producto al Carrito"
+              :columns="columns"
+              :rows="productos"
+              max-height="50vh"
+              :fixed-header="true"
+              :search-options="{
+                enabled: true,
+                externalQuery: buscar,
+              }"
+            >
+              <template slot="table-row" slot-scope="props">
+                <span v-if="props.column.field == 'cantidad'" class="borrar2doSpan">
+                  <input
+                    type="number"
+                    id="cantidadProducto"
+                    min="0"
+                    :max="props.row.stockProd"
+                    value="0"
+                    size="6"
+                    class="form-control"
+                    v-model="props.row.cantidad"
+                    onKeyDown="return false"
+                    @change="changeProd($event, props.row)"
+                  />
+                  <!-- <b-form-spinbutton
+                    id="cantidadProducto"
+                    v-model="props.row.cantidad"
+                    min="0"
+                    :max="props.row.stockProd"
+                    placeholder="0"
+                    @change="changeProd($event, props.row)"
+                  ></b-form-spinbutton> -->
+                </span>
+                <span v-if="props.column.field == 'total'">
+                  {{
+                    props.row.cantidad * props.row.precioUnit > 0
+                      ? props.row.cantidad * props.row.precioUnit
+                      : "0"
+                  }}
+                </span>
+                <span v-else>
+                  {{ props.formattedRow[props.column.field] }}
+                </span>
+              </template>
+            </vue-good-table>
+          </div>
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
@@ -210,8 +258,9 @@
           variant="warning"
           @click="paso = 'datos'"
           v-if="paso === 'productos'"
+          class="text-dark"
         >
-        Atras
+          Atras
         </b-button>
         <b-button
           size="m"
@@ -240,7 +289,10 @@
         <b-button
           size="m"
           variant="success"
-          @click="ok();paso = 'datos'"
+          @click="
+            ok();
+            paso = 'datos';
+          "
           v-if="paso === 'resumen'"
         >
           Confirmar
@@ -252,6 +304,8 @@
 <script>
 import dropdown from "vue-dropdowns";
 import DatePick from "@/components/Calendario/vueDatePick.vue";
+import "vue-good-table/dist/vue-good-table.css";
+import { VueGoodTable } from "vue-good-table";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -259,6 +313,7 @@ export default {
   components: {
     dropdown,
     DatePick,
+    VueGoodTable,
   },
   data() {
     return {
@@ -267,7 +322,7 @@ export default {
         { key: "nombreProd", label: "Nombre" },
         { key: "nombreMarca", label: "Marca" },
         { key: "nombreCategoria", label: "Categoria" },
-        { key: "precioUnit", label: "Precio unitario" },
+        { key: "precioUnit", label: "P. U." },
         "cantidad",
         "descuento",
         {
@@ -281,6 +336,30 @@ export default {
           },
         },
       ],
+      columns: [
+        { field: "upc", label: "UPC" },
+        { field: "nombreProd", label: "Nombre" },
+        { field: "nombreMarca", label: "Marca" },
+        { field: "nombreCategoria", label: "Categoria" },
+        {
+          field: "precioUnit",
+          label: "P. U.",
+          type: "number",
+          globalSearchDisabled: true,
+        },
+        {
+          field: "cantidad",
+          label: "Cantidad",
+          globalSearchDisabled: true,
+          type: "number",
+        },
+        {
+          field: "total",
+          label: "Total",
+          globalSearchDisabled: true,
+        },
+      ],
+      buscar: "",
       object: {
         name: "Efectivo",
       },
@@ -317,6 +396,13 @@ export default {
     },
     tipoOrdenMethod(payload) {
       this.tipoOrden = payload;
+    },
+    changeProd(cantidad, producto) {
+      console.log(producto.cantidad, producto.precioUnit);
+      producto.total = producto.cantidad * producto.precioUnit;
+      this.$nextTick(() => {});
+      console.log(cantidad);
+      console.log(producto);
     },
   },
   computed: {
@@ -462,8 +548,84 @@ blockquote {
   padding-left: 1.5em;
   border-left: 5px solid rgba(0, 0, 0, 0.1);
 }
-.selProductos{
-  display: contents;
+.selProductos {
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
 }
+/* search input */
+input {
+  outline: none;
+}
+input[type="search"] {
+  margin-bottom: 1rem;
+  -webkit-appearance: textfield;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  font-family: inherit;
+  font-size: 100%;
+}
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button {
+  display: none;
+}
+
+input[type="search"] {
+  background: #ededed
+    url(https://static.tumblr.com/ftv85bp/MIXmud4tx/search-icon.png) no-repeat
+    9px center;
+  border: solid 1px #ccc;
+  padding: 9px 10px 9px 32px;
+  width: 55px;
+
+  -webkit-border-radius: 10em;
+  -moz-border-radius: 10em;
+  border-radius: 10em;
+
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  transition: all 0.5s;
+}
+input[type="search"]:focus {
+  width: 30vw;
+  background-color: #fff;
+  border-color: #66cc75;
+
+  -webkit-box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
+  -moz-box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
+  box-shadow: 0 0 5px rgba(109, 207, 246, 0.5);
+}
+
+input:-moz-placeholder {
+  color: #999;
+}
+input::-webkit-input-placeholder {
+  color: #999;
+}
+/* fin del search input */
+/* inicio del spinbuttom */
+::v-deep .b-form-spinbutton.form-control.d-flex.align-items-stretch button {
+  color: black;
+  padding: 0.3rem;
+  transition: all 0.5s ease;
+}
+
+::v-deep .b-form-spinbutton .btn:not([class*="outline"]):hover,
+::v-deep .b-form-spinbutton .btn:not([class*="outline"]):focus {
+  color: #000 !important;
+  font-size: large;
+}
+::v-deep .b-form-spinbutton output {
+  padding: 0;
+}
+/* fin del spinbuttom */
+.descuento {
+  max-width: 5rem;
+}
+/* Para eliminar el extra espan que se muestra en la tabla de productos */
+::v-deep #vgt-table > tbody > tr > td > span:nth-child(2)  {
+  display: none;
+}
+
 /* Fin del body del modal */
 </style>
