@@ -864,5 +864,5 @@ function boundNumber(value, min, max) {
 </script>
 
 <style>
-@import "./vueDatePick.css";
+@import "./vueDatePick.min.css";
 </style>

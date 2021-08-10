@@ -34,9 +34,9 @@
             <table class="table card-text table-hover">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th class="onlyOnWeb">#</th>
                   <th>Nombre</th>
-                  <th>Descripción</th>
+                  <th class="onlyOnWeb">Descripción</th>
                   <th>Operaciones</th>
                 </tr>
               </thead>
@@ -46,23 +46,25 @@
                   v-show="filtro(index) && cat.activoCat === true"
                   :key="index"
                 >
-                  <th scope="row">{{ index + 1 }}</th>
+                  <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
                   <td>{{ cat.nombreCat }}</td>
-                  <td>{{ cat.descripcion }}</td>
+                  <td class="onlyOnWeb">{{ cat.descripcion }}</td>
                   <td>
                     <b-button
                       v-b-modal.modal-delete
                       variant="danger"
                       v-on:click="getCategoriaSelected(cat)"
+                      class="btn btn-outline-danger btn-circle"
                     >
-                      <i class="fa fa-trash" aria-hidden="true"></i>
+                      <i class="fas fa-times" aria-hidden="true"></i>
                     </b-button>
                     <b-button
                       v-b-modal.modal-edit
                       variant="warning"
+                      class="btn btn-outline-warning btn-circle"
                       v-on:click="getCategoriaSelected(cat)"
                     >
-                      <i class="fa fa-edit" aria-hidden="true"></i>
+                      <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </b-button>
                   </td>
                 </tr>
@@ -137,3 +139,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+.btn-circle {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 12px;
+}
+</style>

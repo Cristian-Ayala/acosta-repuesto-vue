@@ -1,7 +1,14 @@
 <template>
-  <div id="sidebar" class="sidebar py-3">
+  <div id="sidebar" class="sidebar py-3 shrink">
     <div
-      class="text-gray-400 text-uppercase px-3 px-lg-4 py-4 font-weight-bold small headings-font-family"
+      class="
+        text-gray-400 text-uppercase
+        px-3 px-lg-4
+        py-4
+        font-weight-bold
+        small
+        headings-font-family
+      "
     >
       MENÚ
     </div>
@@ -33,12 +40,12 @@
         </a>
       </router-link>
       <router-link
-      tag="a"
-      to="/marcas"
-      class="sidebar-link text-muted sidebar-list-item"
-      v-slot="{href, navigate}"
-      custom
-      :class="this.$route.path === '/marcas' ? 'active':''"
+        tag="a"
+        to="/marcas"
+        class="sidebar-link text-muted sidebar-list-item"
+        v-slot="{ href, navigate }"
+        custom
+        :class="this.$route.path === '/marcas' ? 'active' : ''"
       >
         <a :href="href" @click="navigate">
           <i class="fas fa-list-ul mr-4 text-gray my-2"></i>
@@ -66,7 +73,8 @@
         :class="this.$route.path === '/ordenes' ? 'active' : ''"
       >
         <a :href="href" @click="navigate">
-          <i class="fas fa-clipboard-check mr-3 text-gray my-2"></i><span>Ordenes</span>
+          <i class="fas fa-clipboard-check mr-3 text-gray my-2"></i
+          ><span>Ordenes</span>
         </a>
       </router-link>
     </ul>
@@ -84,3 +92,16 @@ export default {
   // },
 };
 </script>
+<style scoped>
+.side-in-enter-active {
+  transition: all 0.3s ease-out;
+}
+.side-in-leave-active {
+  transition: all 0.3s ease-in;
+}
+.side-in-enter,
+.side-in-leave-to {
+  margin-left: -5rem;
+  opacity: 0;
+}
+</style> 

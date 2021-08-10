@@ -11,7 +11,10 @@
               <i class="fa fa-plus" aria-hidden="true"></i>
             </b-button>
           </div>
-          <div class="card-body">
+          <div class="card-body" v-if="windowWidth < 1000">
+            holish xD
+          </div>
+          <div class="card-body" v-if="windowWidth > 1000">
             <div class="form-group position-relative mb-0">
               <button
                 type="submit"
@@ -326,6 +329,7 @@ export default {
       urlApi: `http://localhost:8080/categoria`,
       tab: "",
       catActivas: [],
+      windowWidth: window.innerWidth,
     };
   },
   methods: {
@@ -393,6 +397,9 @@ export default {
     this.catActivas = this.categorias.filter((cat) => cat.activoCat);
     // this.productos = this.productos.forEach((prod) => (prod.edit = false));
     //this.getAll();
+    window.onresize = () => {
+      this.windowWidth = window.innerWidth;
+    };
   },
 };
 </script>
