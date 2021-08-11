@@ -11,14 +11,9 @@
               type="text"
               class="form-control"
               v-model="newProductMobile.upc"
-            /><span class="input-group-text" @click="temp()"><i class="fas fa-barcode" /></span>
-            <v-quagga
-              :onDetected="logIt"
-              :readerSize="readerSize"
-              :readerTypes="['ean_reader']"
-              v-if="showBarcode"
-              class="barcode"
-            ></v-quagga>
+            /><span class="input-group-text" v-b-modal.barCode @click="showBarcode = !showBarcode"
+              ><i class="fas fa-barcode"
+            /></span>
           </div>
         </div>
         <div class="line"></div>
@@ -162,6 +157,7 @@
     <!-- Fin del modal para eliminar (mobile) -->
     <AgregarMar></AgregarMar>
     <AgregarCat></AgregarCat>
+                <UPCReader></UPCReader>
   </div>
 </template>
 <script>
@@ -169,7 +165,7 @@ import { mapState, mapMutations } from "vuex";
 import { blobToURL, fromBlob } from "image-resize-compress";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
-
+import UPCReader from "@/components/Productos/UPCReader.vue";
 export default {
   name: "AddEditProdMovile",
   props: {
@@ -183,15 +179,11 @@ export default {
   components: {
     AgregarMar,
     AgregarCat,
+    UPCReader,
   },
   data() {
     return {
       imagePreview: "",
-      readerSize: {
-        width: 440,
-        height: 280
-      },
-      detecteds: [],
       showBarcode: false,
     };
   },
@@ -236,18 +228,24 @@ export default {
       categoria.nombreCategoria = cache;
       this.descripcionDropdown = categoria.nombreCategoria;
     },
-    logIt(data) {
-      alert("detected", data);
-    },
-    temp(){
-      this.showBarcode = !this.showBarcode
-    }
   },
   computed: {
     ...mapState("productos", ["newProductMobile"]),
     ...mapState("marcas", ["marcas"]),
     ...mapState("categorias", ["categorias"]),
   },
+  watch: {
+    newProductMobile: {
+      // This will let Vue know to look inside the array
+      deep: true,
+      handler(){
+        console.log('Object Product');
+        this.barcode = JSON.parse(JSON.stringify(this.newProductMobile));
+        this.newProductMobile = "";
+        this.newProductMobile = this.barcode;
+      }
+    }
+  }
 };
 </script>
 <style scoped>
@@ -280,12 +278,7 @@ export default {
   width: 4rem;
   justify-content: center;
 }
-.barcode{
-  position: initial;
-  z-index: 100;
-}
-::v-deep .barcode video,::v-deep .drawingBuffer{
-  width: 50vw;
-  height: auto;
-}
+/* .dropdown .btn-group{
+display: inline-flex;
+} */
 </style>
