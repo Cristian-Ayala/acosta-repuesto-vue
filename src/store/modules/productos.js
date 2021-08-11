@@ -12,7 +12,8 @@ export default {
                 stockProd: 100,
                 upc: 53260,
                 nombreMarca: "Motul",
-                nombreCategoria: "Lubricantes"
+                nombreCategoria: "Lubricantes",
+                foto: ""
             }, {
                 nombreProd: "System 7 Blanco",
                 activoProd: true,
@@ -21,7 +22,8 @@ export default {
                 stockProd: 16,
                 upc: 37842,
                 nombreMarca: "BMW",
-                nombreCategoria: "Cascos"
+                nombreCategoria: "Cascos",
+                foto: ""
             },
             {
                 nombreProd: "22 pulgadas",
@@ -31,7 +33,8 @@ export default {
                 stockProd: 7,
                 upc: 23471,
                 nombreMarca: "Dunlop",
-                nombreCategoria: "Llantas"
+                nombreCategoria: "Llantas",
+                foto: ""
             }
         ],
         producto: {
@@ -44,7 +47,8 @@ export default {
             stockProd: null,
             upc: null,
             nombreMarca: "",
-            nombreCategoria: ""
+            nombreCategoria: "",
+            foto: ""
         },
         displayOption: "",
         searchDisplay: "",
@@ -95,8 +99,27 @@ export default {
         editTransaction: [],
         deleteTransaction: [],
         newProd: [],
+        newProductMobile: {},
     },
     mutations: {
+        prodSelected(state, productoSelected) {
+            // check if empty, if it is -> set array with format
+            if (!productoSelected) {
+                state.newProductMobile = {
+                    nombreProd: "",
+                    activoProd: true,
+                    descripcion: "",
+                    precioUnit: 0,
+                    stockProd: 0,
+                    upc: null,
+                    nombreMarca: "",
+                    nombreCategoria: "",
+                    foto: ""
+                };
+            }
+            state.newProductMobile = productoSelected;
+            // this.commit("productos/undoEditProd", state)            
+        },
         /**
          * Agrega un nuevo producto al arreglo newProd para que se pueda comenzar a agregar el producto
          * @param {state de vue} state 

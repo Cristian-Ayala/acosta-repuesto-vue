@@ -6,32 +6,32 @@ export default {
     state: {
         "categorias": [{
                 "idCategoria": "0",
-                "nombreCat": "Llantas",
+                "nombreCategoria": "Llantas",
                 "activoCat": true,
                 "descripcion": "Aqui estan todas las llantas",
             },
             {
                 "idCategoria": "1",
-                "nombreCat": "Cascos",
+                "nombreCategoria": "Cascos",
                 "activoCat": true,
                 "descripcion": "Se listan todos los cascos",
             },
             {
                 "idCategoria": "2",
-                "nombreCat": "Luces Led",
+                "nombreCategoria": "Luces Led",
                 "activoCat": true,
                 "descripcion": "Todas las luces led",
             },
             {
                 "idCategoria": "3",
-                "nombreCat": "Lubricantes",
+                "nombreCategoria": "Lubricantes",
                 "activoCat": true,
                 "descripcion": "Para todo tipos de motor",
             },
         ],
         "categoria": {
             "idCategoria": "0",
-            "nombreCat": "",
+            "nombreCategoria": "",
             "activoCat": true,
             "descripcion": "",
         },
@@ -42,10 +42,10 @@ export default {
          * limpiando valores de la categoria previamente seleccionada
          * @param {*} state 
          */
-        clearData(state) {
+         clearDataCat(state) {
             state.categoria = {
                 idCategoria: null,
-                nombreCat: "",
+                nombreCategoria: "",
                 activoCat: true,
                 descripcion: "",
             };
@@ -56,10 +56,11 @@ export default {
          * @param {*} state 
          */
         createRegistro: function (state) {
-            if (state.categoria.nombreCat.trim() !== "") {
+            if (state.categoria.nombreCategoria.trim() !== "") {
+                console.log(state.categoria);
                 state.categorias.push(state.categoria)
             }
-            if (state.categoria.nombreCat.trim() === "cambiar por if de arriba") {
+            if (state.categoria.nombreCategoria.trim() === "cambiar por if de arriba") {
                 axios
                     .post(urlApi, JSON.stringify(state.categoria), {
                         headers: {

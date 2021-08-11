@@ -7,14 +7,63 @@
             <h6 class="text-uppercase mb-0" style="display: inline-block">
               Productos
             </h6>
-            <b-button variant="success" v-on:click="addProd(tab)">
+            <b-button
+              variant="success"
+              v-on:click="addProd(tab)"
+              v-if="windowWidth >= 1000"
+            >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </b-button>
+            <!-- for mobile action -->
+            <b-button
+              v-b-modal.addEditProdMovile
+              v-if="windowWidth < 1000"
+              variant="success"
+              v-on:click="prodSelected({});title='Agregar producto'"
+              ><i class="fa fa-plus" aria-hidden="true"></i
+            ></b-button>
+            <b-modal id="agregarProduc" title="BootstrapVue">
+              <p class="my-4">Hello from modal!</p>
+            </b-modal>
+            <!-- end of mobile action -->
           </div>
-          <div class="card-body" v-if="windowWidth < 1000">
-            holish xD
+          <div v-if="windowWidth < 1000" style="padding: 1rem">
+            <b-card
+              v-for="prod in productos"
+              img-src="https://placekitten.com/200/100"
+              img-alt="Card image"
+              img-top
+              border-variant="dark"
+              align="center"
+              class="cardProductosMobile"
+              :key="prod.upc"
+            >
+              <b-card-text>
+                <h5>{{ prod.nombreProd }}</h5>
+                UPC: {{ prod.upc }}<br />
+                Precio: <b>${{ prod.precioUnit }}</b
+                ><br />
+                Stock: {{ prod.stock }}<br />
+                Marca: {{ prod.nombreMarca }}<br />
+                Categoria:{{ prod.nombreCategoria }}<br />
+                <!-- for mobile action -->
+                <b-button
+                  v-b-modal.addEditProdMovile
+                  @click="prodSelected(prod);title='Editar producto'"
+                  class="btn btn-outline-warning btn-circle"
+                  ><i class="fas fa-pencil-alt" aria-hidden="true" />
+                </b-button>
+                <b-button
+                  v-b-modal.deleteProduc
+                  @click="prodSelected(prod)"
+                  class="btn btn-outline-danger btn-circle"
+                  ><i class="fas fa-times" aria-hidden="true" />
+                </b-button>
+                <!-- end of mobile action -->
+              </b-card-text>
+            </b-card>
           </div>
-          <div class="card-body" v-if="windowWidth > 1000">
+          <div class="card-body" v-if="windowWidth >= 1000">
             <div class="form-group position-relative mb-0">
               <button
                 type="submit"
@@ -309,18 +358,24 @@
         </div>
       </div>
       <ConfirmarTransacciones></ConfirmarTransacciones>
+      <EliminarProdMovil></EliminarProdMovil>
+      <AddEditProdMovile :title="title"></AddEditProdMovile>
     </div>
   </div>
 </template>
 
 <script>
 import ConfirmarTransacciones from "@/components/Productos/ConfirmarTransacciones.vue";
+import EliminarProdMovil from "@/components/Productos/EliminarProdMovil.vue";
+import AddEditProdMovile from "@/components/Productos/AddEditProdMovile.vue";
 import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "Productos",
   components: {
     ConfirmarTransacciones,
+    EliminarProdMovil,
+    AddEditProdMovile
   },
   data: () => {
     return {
@@ -330,6 +385,7 @@ export default {
       tab: "",
       catActivas: [],
       windowWidth: window.innerWidth,
+      title:"Editar"
     };
   },
   methods: {
@@ -344,6 +400,7 @@ export default {
       "removeNewRegistro",
       "saveNewProduct",
       "editNewRegistro",
+      "prodSelected",
     ]),
 
     filtro(valor) {
@@ -357,6 +414,7 @@ export default {
       ).toUpperCase();
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
+    
   },
   computed: {
     ...mapState("productos", [
@@ -368,9 +426,10 @@ export default {
       "deleteTransaction",
       "editTransaction",
       "numeroDeEditados",
+      "newProductMobile",
     ]),
     ...mapState("categorias", ["categorias"]),
-
+    // funcion que evalua si hay algun dato en cache para que el boton de "Aplicar Cambios" se muestre
     applyChanges: function () {
       let nuevosProductos = this.newProd.filter((prod) => prod.state === 1);
       if (nuevosProductos.length > 0) {
@@ -460,5 +519,30 @@ td input {
 }
 .borderDanger {
   border-color: #dc3545 !important;
+}
+@media (max-width: 1000px) {
+  .card-body {
+    background-color: #f8f9fb;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-bottom-left-radius: calc(1rem - 1px);
+    border-bottom-right-radius: calc(1rem - 1px);
+  }
+  .card-body div.cardProductosMobile {
+    margin: 5px;
+  }
+  .card.cardProductosMobile {
+    border: 1px solid #7b7b7b !important;
+    margin-bottom: 1rem;
+  }
+  .cardProductosMobile {
+    width: 100%;
+    display: inline-flex;
+  }
 }
 </style>

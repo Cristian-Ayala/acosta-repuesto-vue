@@ -8,7 +8,7 @@
             <input
               type="text"
               class="form-control"
-              v-model="categoria.nombreCat"
+              v-model="categoria.nombreCategoria"
             />
           </div>
         </div>

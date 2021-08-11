@@ -10,7 +10,7 @@
             <b-button
               v-b-modal.modal-1
               variant="success"
-              v-on:click="clearData()"
+              v-on:click="clearDataCat()"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </b-button>
@@ -47,7 +47,7 @@
                   :key="index"
                 >
                   <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ cat.nombreCat }}</td>
+                  <td>{{ cat.nombreCategoria }}</td>
                   <td class="onlyOnWeb">{{ cat.descripcion }}</td>
                   <td>
                     <b-button
@@ -102,7 +102,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("categorias", ["clearData", "getCategoriaSelected"]),
+    ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
 
     /*
         recolecta todos los datos al hacer una peticion al api
