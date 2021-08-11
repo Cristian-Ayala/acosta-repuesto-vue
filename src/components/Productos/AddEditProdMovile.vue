@@ -5,14 +5,20 @@
       <div v-if="newProductMobile">
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
-          <div class="col-md-9">
-          </div>
+          <div class="col-md-9"></div>
           <div class="col-md-9 input-group">
             <input
               type="text"
               class="form-control"
               v-model="newProductMobile.upc"
-            /><span class="input-group-text"><i class="fas fa-barcode"/></span>
+            /><span class="input-group-text" @click="temp()"><i class="fas fa-barcode" /></span>
+            <v-quagga
+              :onDetected="logIt"
+              :readerSize="readerSize"
+              :readerTypes="['ean_reader']"
+              v-if="showBarcode"
+              class="barcode"
+            ></v-quagga>
           </div>
         </div>
         <div class="line"></div>
@@ -181,6 +187,12 @@ export default {
   data() {
     return {
       imagePreview: "",
+      readerSize: {
+        width: 440,
+        height: 280
+      },
+      detecteds: [],
+      showBarcode: false,
     };
   },
   methods: {
@@ -224,6 +236,12 @@ export default {
       categoria.nombreCategoria = cache;
       this.descripcionDropdown = categoria.nombreCategoria;
     },
+    logIt(data) {
+      alert("detected", data);
+    },
+    temp(){
+      this.showBarcode = !this.showBarcode
+    }
   },
   computed: {
     ...mapState("productos", ["newProductMobile"]),
@@ -261,5 +279,13 @@ export default {
   border-radius: 0 1rem 1rem 0;
   width: 4rem;
   justify-content: center;
+}
+.barcode{
+  position: initial;
+  z-index: 100;
+}
+::v-deep .barcode video,::v-deep .drawingBuffer{
+  width: 50vw;
+  height: auto;
 }
 </style>
