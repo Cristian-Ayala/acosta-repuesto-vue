@@ -11,7 +11,10 @@
               type="text"
               class="form-control"
               v-model="newProductMobile.upc"
-            /><span class="input-group-text" v-b-modal.barCode @click="showBarcode = !showBarcode"
+            /><span
+              class="input-group-text"
+              v-b-modal.barCode
+              @click="showBarcode = !showBarcode"
               ><i class="fas fa-barcode"
             /></span>
           </div>
@@ -157,7 +160,7 @@
     <!-- Fin del modal para eliminar (mobile) -->
     <AgregarMar></AgregarMar>
     <AgregarCat></AgregarCat>
-                <UPCReader></UPCReader>
+    <UPCReader></UPCReader>
   </div>
 </template>
 <script>
@@ -238,14 +241,14 @@ export default {
     newProductMobile: {
       // This will let Vue know to look inside the array
       deep: true,
-      handler(){
-        console.log('Object Product');
+      handler() {
+        console.log("Object Product");
         this.barcode = JSON.parse(JSON.stringify(this.newProductMobile));
         this.newProductMobile = "";
         this.newProductMobile = this.barcode;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 <style scoped>
@@ -281,4 +284,42 @@ export default {
 /* .dropdown .btn-group{
 display: inline-flex;
 } */
+.dropdown-toggle::after {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 0.255em;
+  vertical-align: 0.255em;
+  content: "";
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+}
+::v-deep div.dropdown button.dropdown-toggle {
+  color: #ffffff;
+  min-width: auto;
+  padding: 0.4rem 1.8rem;
+  text-transform: none;
+  font-weight: 300;
+  margin-bottom: 0;
+  background-image: none;
+  background-size: 0 2px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: bottom, 50% calc(100% - 1px);
+  background-color: #343a40;
+  transition: background 0s ease-out;
+  float: none;
+  box-shadow: none;
+  border-radius: 0 1rem 1rem 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 100%;
+}
+
+::v-deep div.dropdown.b-dropdown.m-2.btn-group {
+  display: inline-flex;
+}
 </style>
+

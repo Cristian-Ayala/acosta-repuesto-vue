@@ -19,7 +19,10 @@
               v-b-modal.addEditProdMovile
               v-if="windowWidth < 1000"
               variant="success"
-              v-on:click="prodSelected({});title='Agregar producto'"
+              v-on:click="
+                prodSelected({});
+                title = 'Agregar producto';
+              "
               ><i class="fa fa-plus" aria-hidden="true"></i
             ></b-button>
             <b-modal id="agregarProduc" title="BootstrapVue">
@@ -30,7 +33,7 @@
           <div v-if="windowWidth < 1000" style="padding: 1rem">
             <b-card
               v-for="prod in productos"
-              img-src="https://placekitten.com/200/100"
+              :img-src="prod.foto"
               img-alt="Card image"
               img-top
               border-variant="dark"
@@ -49,7 +52,10 @@
                 <!-- for mobile action -->
                 <b-button
                   v-b-modal.addEditProdMovile
-                  @click="prodSelected(prod);title='Editar producto'"
+                  @click="
+                    prodSelected(prod);
+                    title = 'Editar producto';
+                  "
                   class="btn btn-outline-warning btn-circle"
                   ><i class="fas fa-pencil-alt" aria-hidden="true" />
                 </b-button>
@@ -92,10 +98,10 @@
             <b-nav tabs fill>
               <b-nav-item
                 v-for="cat in catActivas"
-                :key="cat.nombreCat"
-                :active="tab === cat.nombreCat"
-                @click="tab = cat.nombreCat"
-                >{{ cat.nombreCat }}</b-nav-item
+                :key="cat.nombreCategoria"
+                :active="tab === cat.nombreCategoria"
+                @click="tab = cat.nombreCategoria"
+                >{{ cat.nombreCategoria }}</b-nav-item
               >
             </b-nav>
             <!-- Tabla para nuevos productos -->
@@ -375,7 +381,7 @@ export default {
   components: {
     ConfirmarTransacciones,
     EliminarProdMovil,
-    AddEditProdMovile
+    AddEditProdMovile,
   },
   data: () => {
     return {
@@ -385,7 +391,7 @@ export default {
       tab: "",
       catActivas: [],
       windowWidth: window.innerWidth,
-      title:"Editar"
+      title: "Editar",
     };
   },
   methods: {
@@ -414,7 +420,6 @@ export default {
       ).toUpperCase();
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
-    
   },
   computed: {
     ...mapState("productos", [
@@ -452,7 +457,7 @@ export default {
      */
   mounted() {
     //para setear como active el tab del inicio
-    this.tab = this.categorias[0].nombreCat;
+    this.tab = this.categorias[0].nombreCategoria;
     this.catActivas = this.categorias.filter((cat) => cat.activoCat);
     // this.productos = this.productos.forEach((prod) => (prod.edit = false));
     //this.getAll();
@@ -543,6 +548,10 @@ td input {
   .cardProductosMobile {
     width: 100%;
     display: inline-flex;
+  }
+  .cardProductosMobile img {
+    width: 150px;
+    align-self: center;
   }
 }
 </style>
