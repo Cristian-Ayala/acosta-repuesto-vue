@@ -237,16 +237,32 @@ export default {
     ...mapState("marcas", ["marcas"]),
     ...mapState("categorias", ["categorias"]),
   },
+  mounted() {},
   watch: {
     newProductMobile: {
       // This will let Vue know to look inside the array
-      deep: true,
       handler() {
-        console.log("Object Product");
-        this.barcode = JSON.parse(JSON.stringify(this.newProductMobile));
-        this.newProductMobile = "";
-        this.newProductMobile = this.barcode;
+        if (this.newProductMobile) {
+          if (this.newProductMobile.nombreCategoria) {
+            this.descripcionDropdown = this.newProductMobile.nombreCategoria;
+          }else{
+            this.descripcionDropdown = "";
+          }
+          if (this.newProductMobile.nombreMarca) {
+            this.marcaDropdown = this.newProductMobile.nombreMarca;
+          }else{
+            this.marcaDropdown = ""
+          }
+          if (this.newProductMobile.foto) {
+            this.imagePreview = this.newProductMobile.foto;
+          }else{
+            this.imagePreview = ""
+          }
+        }
       },
+    },
+    barcode() {
+      this.newProductMobile = this.barcode;
     },
   },
 };

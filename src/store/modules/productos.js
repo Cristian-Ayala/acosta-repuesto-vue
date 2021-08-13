@@ -104,8 +104,8 @@ export default {
     mutations: {
         prodSelected(state, productoSelected) {
             // check if empty, if it is -> set array with format
-            if (!productoSelected) {
-                state.newProductMobile = {
+            if (!Object.keys(productoSelected).length) {
+                productoSelected = {
                     nombreProd: "",
                     activoProd: true,
                     descripcion: "",

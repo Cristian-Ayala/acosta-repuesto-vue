@@ -46,7 +46,7 @@
                 UPC: {{ prod.upc }}<br />
                 Precio: <b>${{ prod.precioUnit }}</b
                 ><br />
-                Stock: {{ prod.stock }}<br />
+                Stock: {{ prod.stockProd }}<br />
                 Marca: {{ prod.nombreMarca }}<br />
                 Categoria:{{ prod.nombreCategoria }}<br />
                 <!-- for mobile action -->

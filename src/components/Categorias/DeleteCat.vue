@@ -4,7 +4,7 @@
       <div class="card-body">
         <h6 style="font-weight: 400; text-align: center">
           ¿Está seguro que quiere eliminar la categoria "{{
-            categoria.nombreCat
+            categoria.nombreCategoria
           }}"?
         </h6>
       </div>
