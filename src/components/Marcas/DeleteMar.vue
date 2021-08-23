@@ -2,10 +2,8 @@
   <div>
     <b-modal id="modal-deleteMar" centered title="Eliminar Marca">
       <div class="card-body">
-        <h6 style="font-weight: 400; text-align: center">
-          ¿Está seguro que quiere eliminar la marca "{{
-            marca.nombreMarca
-          }}"?
+        <h6 style="font-weight: 400; text-align: center" v-if="marca.doc">
+          ¿Está seguro que quiere eliminar la marca "{{ marca.doc.nombreMarca }}"?
         </h6>
       </div>
 
@@ -29,7 +27,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "DeleteMar",
@@ -37,7 +35,7 @@ export default {
     return {};
   },
   methods: {
-    ...mapMutations("marcas", ["removeRegistro"]),
+    ...mapActions("marcas", ["removeRegistro"]),
   },
   computed: {
     ...mapState("marcas", ["marca"]),

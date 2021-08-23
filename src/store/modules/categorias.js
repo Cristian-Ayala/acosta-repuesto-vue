@@ -1,6 +1,3 @@
-import axios from 'axios'
-const urlApi = "url/categorias/"
-
 export default {
     namespaced: true,
     state: {
@@ -61,19 +58,20 @@ export default {
                 state.categorias.push(state.categoria)
             }
             if (state.categoria.nombreCategoria.trim() === "cambiar por if de arriba") {
-                axios
-                    .post(urlApi, JSON.stringify(state.categoria), {
-                        headers: {
-                            "content-type": "application/json",
-                        },
-                    })
-                    .then((response) => {
-                        console.log(response.status);
-                        this.getAll();
-                    })
-                    .catch((ex) => {
-                        console.log(ex);
-                    });
+                // 
+                //     .post(urlApi, JSON.stringify(state.categoria), {
+                //         headers: {
+                //             "content-type": "application/json",
+                //         },
+                //     })
+                //     .then((response) => {
+                //         console.log(response.status);
+                //         this.getAll();
+                //     })
+                //     .catch((ex) => {
+                //         console.log(ex);
+                //     });
+                return;
             }
         },
         /**
@@ -90,40 +88,10 @@ export default {
          */
         removeRegistro: function (state) {
             state.categoria.activoCat = false;
-
-            let x = 0;
-            if (x === 0) return console.log("");
-
-            axios
-                .put(this.urlApi + "/remove/" + this.categoria.idCategoria)
-                .then((response) => {
-                    this.getAll();
-                    console.log(response.status);
-                })
-                .catch((ex) => {
-                    console.log(ex);
-                });
         },
         edithRegistro(state, catSelected) {
             var index = state.categorias.findIndex(element => element.idCategoria === catSelected.idCategoria);
-            state.categorias.splice(index, 1, catSelected);
-
-            let x = 0;
-            if (x === 0) return console.log("");
-
-            axios
-                .put(this.urlApi, JSON.stringify(this.categoria), {
-                    headers: {
-                        "content-type": "application/json",
-                    },
-                })
-                .then((response) => {
-                    this.getAll();
-                    console.log(response.status);
-                })
-                .catch((ex) => {
-                    console.log(ex);
-                });
+            state.categorias.splice(index, 1, catSelected);            
         },
     }
 }

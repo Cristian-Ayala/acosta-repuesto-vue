@@ -30,26 +30,34 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="createRegistro(); ok()"> Guardar </b-button>
+        <b-button
+          size="m"
+          variant="primary"
+          @click="
+            createRegistro();
+            ok();
+          "
+        >
+          Guardar
+        </b-button>
       </template>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex"
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "AgregarMar",
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
-    ...mapMutations("marcas",["createRegistro"]),
+    ...mapActions("marcas", ["createRegistro"]),
   },
   computed: {
-    ...mapState("marcas",["marca"]),
+    ...mapState("marcas", ["marca"]),
   },
 };
 </script>

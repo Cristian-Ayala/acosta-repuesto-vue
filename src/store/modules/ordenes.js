@@ -1,4 +1,3 @@
-import axios from 'axios'
 const ApiRestUrl = "url/productos/"
 
 export default {
@@ -13,7 +12,6 @@ export default {
             "observacionesOrden": "No tiene moto pero viene a comprar",
             "totalOrden": 155.97,
             "productos": [{
-                idMarca: 0,
                 nombreProd: "20W50",
                 activoProd: true,
                 descripcion: "Lubricante para motos",
@@ -26,7 +24,6 @@ export default {
                 cantidad: 3,
                 descuento: 0
             }, {
-                idMarca: 1,
                 nombreProd: "System 7 Blanco",
                 activoProd: true,
                 descripcion: "Carcasa completa de carbono",
@@ -49,23 +46,19 @@ export default {
         searchDisplay: "",
         urlApi: `${ApiRestUrl}orden`,
         marcas: [{
-                idMarca: "0",
                 nombreMarca: "Motul",
                 activoMarca: true,
                 descripMarca: "Generalmente vende productos de mantenimineto de motos",
             }, {
-                idMarca: "1",
                 nombreMarca: "BMW",
                 activoMarca: true,
                 descripMarca: "Motos lujosas",
             },
             {
-                idMarca: "2",
                 nombreMarca: "Kawasaki",
                 activoMarca: true,
                 descripMarca: "Fabricadas en plantas en Japón.",
             }, {
-                idMarca: "3",
                 nombreMarca: "Ducati",
                 activoMarca: true,
                 descripMarca: "Unas motos cholas que son bien caras",
@@ -91,7 +84,6 @@ export default {
         ],
         ordSelected: {},
         productos: [{
-            idMarca: 0,
             nombreProd: "20W50",
             activoProd: true,
             descripcion: "Lubricante para motos",
@@ -104,7 +96,6 @@ export default {
             cantidad: 0,
             descuento: 0
         }, {
-            idMarca: 1,
             nombreProd: "System 7 Blanco",
             activoProd: true,
             descripcion: "Carcasa completa de carbono",
@@ -150,163 +141,10 @@ export default {
             });
             this.detalleOrden = this.detalleOrden.filter(obj => obj.cantidadProd > 0);
             //Creando objeto para orden
-            this.orden.idMetodoPago = this.metPago.filter(metPag => metPag.nombrePago === this.metPagoSelected)[0].idMetodoPago;
-            if (this.orden.nombreCliente.trim() !== "" && this.orden.totalOrden > 0 && this.orden.idMetodoPago >= 0) {
-                axios.post(this.urlApi, JSON.stringify(this.orden), {
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                }).then(response => {
-                    let ordenId = response.data;
-                    console.log("orden es", ordenId)
-                    console.log("Estos son los productos", this.detalleOrden)
-                    //sólo productos seleccionados
-                    this.detalleOrden.map(prod => {
-                        console.log("Cantidad", prod.cantidadProd)
-                        if (prod.cantidadProd > 0) {
-                            prod.idOrden = ordenId;
-                            console.log("Producto con idOrden", prod)
-                            console.log("Esto envié: ", JSON.stringify(prod));
-                            axios.post(ApiRestUrl + "detalleOrden", JSON.stringify(prod), {
-                                headers: {
-                                    'content-type': 'application/json'
-                                }
-                            }).then(response => {
-                                console.log("se supone que ya estoy .-.")
-                                console.log(response);
-                                //reiniciar todo
-                                // this.getAll();
-                                // this.getProductos();
-                                // this.clearData();
-                                let stockNew = {
-                                    stockProd: prod.stockProd - prod.cantidadProd
-                                };
-                                //Modifcar el stock de cada producto
-                                axios.put(ApiRestUrl + "producto/stock/" + prod.upc, JSON.stringify(stockNew), {
-                                    headers: {
-                                        'content-type': 'application/json'
-                                    }
-                                }).then(
-                                    response => {
-                                        this.metPago = response.data;
-                                        location.reload();
-                                    }
-                                ).catch(ex => {
-                                    console.log(ex)
-                                });
-                            }).catch(ex => {
-
-                                console.log(ex);
-
-                            })
-                        }
-                    });
-
-                }).catch(ex => {
-                    console.log(ex)
-                });
-            } else {
-                console.log("No se pudo registrar la orden porque uno de los valores es nulo, indefinido o está vacio");
-            }
+            this.orden.idMetodoPago = this.metPago.filter(metPag => metPag.nombrePago === this.metPagoSelected)[0].idMetodoPago;                
 
         },
-
-        /*
-        eliman registros, correspondiente al id seleccionado
-         */
-        removeRegistro: function () {
-            axios.put(this.urlApi + "/remove/" + this.ordSelected.idOrden).then(
-                response => {
-                    localStorage.setItem("orden-eliminada", this.ordSelected.idOrden);
-                    location.reload();
-                    console.log(response.status)
-                }
-            ).catch(ex => {
-                console.log(ex)
-            });
-
-        },
-        //Obtener productos
-        getProductos: function () {
-            axios.get(ApiRestUrl + "producto").then(
-                response => {
-                    this.productos = response.data.map((obj) => {
-                        let object = {
-                            "activoProd": obj.activoProd,
-                            "descripcion": obj.descripcion,
-                            "idCategoria": obj.idCategoria,
-                            "idMarca": obj.idMarca,
-                            "nombreProd": obj.nombreProd,
-                            "precioUnit": obj.precioUnit,
-                            "stockProd": obj.stockProd,
-                            "upc": obj.upc,
-                            "cantidad": null,
-                            "descuento": 0
-                        };
-                        return object;
-                    });
-                    //Filtrar productos activos solamentes
-                    this.productos = this.productos.filter(prod => {
-                        if (prod.activoProd) {
-                            return prod;
-
-                        }
-                    });
-                }
-            ).catch(ex => {
-                console.log(ex)
-            })
-        },
-
-        /*
-        recolecta todos los datos al hacer una peticion al api
-         */
-        getAll: async function () {
-            await axios.get(ApiRestUrl + "detalleOrden").then(
-                response => {
-                    this.ordenes = response.data
-                    this.ordenes.map(detOrd => {
-                        this.activaOrd.map(ordenActiva => {
-                            if (ordenActiva === detOrd.orden.idOrden) {
-                                try {
-                                    if (typeof this.ordenes[this.i].idOrden != 'undefined') {
-                                        if (this.ordenes[this.i].idOrden !== detOrd.orden.idOrden) {
-                                            this.i++;
-                                            this.j = 0;
-                                            this.productosObject = [];
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.log("kk");
-                                }
-                                this.ordenes[this.i] = detOrd.orden;
-                                this.productosObject.push(detOrd.producto);
-                                this.ordenes[this.i].productos = this.productosObject;
-                                this.ordenes[this.i].productos[this.j].descuento = detOrd.descuento;
-                                this.ordenes[this.i].productos[this.j].cantidadProd = detOrd.cantidadProd;
-                                this.ordenes[this.i].productos[this.j].precioUnit = detOrd.precioUnit;
-                                this.ordenes[this.i].nombrePago = this.ordenes[this.i].idMetodoPago.nombrePago;
-                                try {
-                                    //para quitar [UTC] al final de la fecha
-                                    let myDate = new Date(this.ordenes[this.i].fechaOrd.slice(0, this.ordenes[this.i].fechaOrd.length - 5));
-                                    this.ordenes[this.i].fechaOrd = this.formatDate(myDate);
-                                    this.ordenes[this.i].totalOrden = this.ordenes[this.i].totalOrden.toFixed(2);
-                                } catch (error) {
-                                    console.log("kk");
-                                }
-                                this.j++;
-                            }
-                        });
-                    });
-
-                }
-            ).catch(ex => {
-                console.log(ex)
-            })
-            //Quita los que no son ordenes sino detallesOrdenes
-            this.ordenes = this.ordenes.slice(0, this.i + 1);
-        },
-        restartObject: function () {
+    restartObject: function () {
             console.log("Me llamaron?")
             this.i++;
             this.j = 0;
@@ -452,54 +290,3 @@ export default {
         },
     },
 }
-/*
-hook para inicializar los valores de la tabla
- */
-//     mounted() {
-//         //Obtiene id De las ordenes activas
-//         axios.get(ApiRestUrl + "orden/soloActivos").then(
-//             response => {
-//                 this.activaOrd = response.data;
-//                 this.getAll();
-//             }
-//         ).catch(ex => {
-//             console.log(ex)
-//         });
-//         // Obtener las categorias
-//         axios.get(ApiRestUrl + "categoria").then(
-//             response => {
-//                 this.categorias = response.data;
-//                 // Obtener las marcas
-//                 axios.get(ApiRestUrl + "marca").then(
-//                     response => {
-//                         this.marcas = response.data;
-//                         this.getProductos();
-//                     }
-//                 ).catch(ex => {
-//                     console.log(ex)
-//                 })
-//             }
-//         ).catch(ex => {
-//             console.log(ex)
-//         })
-//         //Get Metodos pagos
-//         axios.get(ApiRestUrl + "metodoPago").then(
-//             response => {
-//                 this.metPago = response.data;
-//             }
-//         ).catch(ex => {
-//             console.log(ex)
-//         });
-//     },
-//     watch: {
-//         //actualiza el array de productos detalle orden
-//         productos: {
-//             // Permite detectar cambios dentro del array
-//             deep: true,
-//             // Se filtra al detalle orden solo los productos con cantidades positivas
-//             handler() {
-//                 this.calcularTotal();
-//             }
-//         }
-//     }
-// });

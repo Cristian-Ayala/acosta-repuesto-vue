@@ -1,109 +1,177 @@
-import axios from 'axios'
-const urlApi = "url/categorias/"
-
+var PouchDB = require('pouchdb').default;
+PouchDB.plugin(require('pouchdb-find').default);
 export default {
     namespaced: true,
     state: {
-        "marcas": [{
-            "idMarca": "0",
-            "nombreMarca": "Motul",
-            "activoMarca": true,
-            "descripMarca": "Generalmente vende productos de mantenimineto de motos",
-        },{
-            "idMarca": "1",
-            "nombreMarca": "BMW",
-            "activoMarca": true,
-            "descripMarca": "Motos lujosas",
-        },
-        {
-            "idMarca": "2",
-            "nombreMarca": "Kawasaki",
-            "activoMarca": true,
-            "descripMarca": "Fabricadas en plantas en Japón.",
-        },{
-            "idMarca": "3",
-            "nombreMarca": "Ducati",
-            "activoMarca": true,
-            "descripMarca": "Unas motos cholas que son bien caras",
-        }],
+        "marcas": [],
         "marca": {
-            "idMarca": "0",
             "nombreMarca": "",
             "activoMarca": true,
             "descripMarca": "",
         },
-        "marSelected":{}
+        "marSelected": {},
+        "localMarca": null,
+        "PouchDB": PouchDB,
     },
     mutations: {
         clearData(state) {
             state.marca = {
-                idMarca: null,
                 nombreMarca: "",
                 activoMarca: true,
                 descripMarca: "",
             };
         },
-        createRegistro: function (state) {
-            if (state.marca.nombreMarca.trim() !== "") {
-                state.marcas.push(state.marca)
-            }
-            if (state.marca.nombreMarca.trim() === "cambiar por if de arriba") {
-                axios
-                    .post(urlApi, JSON.stringify(state.marca), {
-                        headers: {
-                            "content-type": "application/json",
-                        },
-                    })
-                    .then((response) => {
-                        console.log(response.status);
-                        this.getAll();
-                    })
-                    .catch((ex) => {
-                        console.log(ex);
-                    });
-            }
-        },
         getMarcaSelected(state, mar) {
             state.marca = mar;
             state.marSelected = JSON.parse(JSON.stringify(mar));
         },
-        removeRegistro: function (state) {
-            state.marca.activoMarca = false;
-
-            let x = 0;
-            if (x === 0) return console.log("");
-
-            axios
-                .put(this.urlApi + "/remove/" + this.marca.idMarca)
-                .then((response) => {
-                    this.getAll();
-                    console.log(response.status);
-                })
-                .catch((ex) => {
-                    console.log(ex);
-                });
+        alertNotification(state, {
+            message,
+            duration
+        }) {
+            this._vm.$awn.alert(message, {
+                durations: {
+                    success: duration
+                }
+            });
         },
-        edithRegistro(state, marSelected) {
-            var index = state.marcas.findIndex(element => element.idMarca === marSelected.idMarca);
-            state.marcas.splice(index, 1, marSelected);
+        successNotification(state, {
+            message,
+            duration,
+            tittle
+        }) {
+            this._vm.$awn.success(message, {
+                durations: {
+                    success: duration
+                },
+                labels: {
+                    success: tittle
+                }
+            });
+        }
+    },
+    actions: {
+        createRegistro({
+            state,
+            dispatch,
+            commit
+        }) {
+            if (state.marca.nombreMarca.trim() !== "") {
+                //For puchDB we need to add an _id field 
+                state.marca._id = new Date().toISOString()
+                state.localMarca.put(state.marca).then(() => {
 
-            let x = 0;
-            if (x === 0) return console.log("");
+                    dispatch('getAll').then(() => commit("successNotification", {
+                        "message": "Marca agregada con éxito",
+                        "tittle": "EXITO",
+                        "duration": 4000
+                    }));
 
-            axios
-                .put(this.urlApi, JSON.stringify(this.marca), {
-                    headers: {
-                        "content-type": "application/json",
-                    },
-                })
-                .then((response) => {
-                    this.getAll();
-                    console.log(response.status);
-                })
-                .catch((ex) => {
-                    console.log(ex);
+                }).catch((err) => {
+                    commit("alertNotification", {
+                        "message": "Error al guardar la marca<br>" + err,
+                        "duration": 4000
+                    });
                 });
+            } else {
+                commit("alertNotification", {
+                    "message": "Por favor, introduce un nombre para la marca",
+                    "duration": 4000
+                });
+            }
         },
+        getAll({
+            state,
+            commit
+        }) {
+            /**
+             * Does not matter if all docs are retived even if they are deleted (activoMarca = false)
+             * Because it's handled in marcas component
+             */
+            state.localMarca.allDocs({
+                include_docs: true,
+                descending: false
+            }).then(doc => {
+                state.marcas = doc.rows.filter(marca => marca.doc.activoMarca);
+            }).catch(err => commit("alertNotification", {
+                "message": "Error al listar marcas.<br>" + err,
+                "duration": 4000
+            }));
+        },
+        edithRegistro({
+            state,
+            commit,
+            dispatch
+        }) {
+            state.localMarca.put(state.marSelected.doc).then(() => {
+                dispatch("getAll").then(() => commit("successNotification", {
+                    "message": "Marca editada con éxito",
+                    "tittle": "EXITO",
+                    "duration": 4000
+                }));
+            }).catch((err) => {
+                commit("alertNotification", {
+                    "message": "Error al editar la marca<br>" + err,
+                    "duration": 4000
+                });
+            });
+        },
+        removeRegistro({
+            state,
+            commit,
+            dispatch
+        }) {
+            state.marca.doc.activoMarca = false;
+            state.localMarca.put(state.marca.doc).then(() => {
+                dispatch("getAll");
+                commit("successNotification", {
+                    "message": "Marca eliminada con éxito",
+                    "tittle": "EXITO",
+                    "duration": 4000
+                });
+            }).catch((err) => {
+                commit("alertNotification", {
+                    "message": "Error al eliminar la marca<br>" + err,
+                    "duration": 4000
+                });
+            });
+        },
+        initDB({
+            state,
+            dispatch
+        }) {
+            // console.log(this._vm.$url, " Es el url a la que hacer fetch");
+            const remoteMarca = new state.PouchDB(this._vm.$url + "marcas", {
+                headers: {
+                    'Authorization': 'Basic Credentials'
+                }
+            });
+
+            state.localMarca = new state.PouchDB("marcas");
+            // do one way, one-off sync from the server until completion
+            state.localMarca.replicate.from(remoteMarca).on('complete', () => {
+                // console.log("Se terminó la replicación");
+                dispatch("getAll");
+                // then two-way, continuous, retriable sync
+                state.localMarca.sync(remoteMarca, {
+                        live: true,
+                        retry: true
+                    }).on('change', function (change) {
+                        console.log("yo, something changed!", change);
+                        dispatch("getAll");
+                    }).on('paused', function (info) {
+                        console.log("replication was paused, usually because of a lost connection", info);
+                    }).on('active', function (info) {
+                        console.log("replication was resumed", info);
+                    }).on('denied', function (err) {
+                        console.log("a document failed to replicate (e.g. due to permissions)", err);
+                    })
+                    .on('complete', function (info) {
+                        console.log("Completado", info);
+                    }).on('error', function (err) {
+                        console.log("totally unhandled error (shouldn't happen)", err);
+                    });
+            })
+        }
     }
-
 }

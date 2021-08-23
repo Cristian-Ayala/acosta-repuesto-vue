@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
 import DeleteCat from "@/components/Categorias/DeleteCat.vue";
 import EditCat from "@/components/Categorias/EditCat.vue";
@@ -103,23 +102,6 @@ export default {
   },
   methods: {
     ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
-
-    /*
-        recolecta todos los datos al hacer una peticion al api
-         */
-    getAll() {
-      axios
-        .get(this.urlApi)
-        .then((response) => {
-          this.categorias = response.data;
-          this.categorias = this.categorias.filter(
-            (cat) => cat.activoCat === true
-          );
-        })
-        .catch((ex) => {
-          console.log(ex);
-        });
-    },
     filtro(valor) {
       if (this.searchDisplay === "") return true;
       let array = (
@@ -130,12 +112,6 @@ export default {
   },
   computed: {
     ...mapState("categorias", ["categorias", "categoria"]),
-  },
-  /*
-    hook para inicializar los valores de la tabla
-     */
-  mounted() {
-    //this.getAll();
   },
 };
 </script>

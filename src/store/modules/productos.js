@@ -1,6 +1,3 @@
-import axios from 'axios'
-const urlApi = "url/productos/"
-
 export default {
     namespaced: true,
     state: {
@@ -192,53 +189,6 @@ export default {
             state.newProd[index].state = 2
         },
         /*
-                Modifica el registro seleccionado
-                */
-        edithRegistro() {
-            this.producto.idMarca = this.marcas.filter(mar => mar.nombreMarca === this.producto.nombreMarca)[0].idMarca;
-            this.producto.idCategoria = this.categorias.filter(cat => cat.nombreCat === this.producto.nombreCategoria)[0].idCategoria;
-            if (this.producto.upc.trim() !== "" && this.producto.stockProd > 0 && this.producto.nombreProd.trim() !== "" && this.producto.idMarca > 0 && this.producto.idCategoria > 0) {
-                console.log(this.producto);
-                axios.put(urlApi, JSON.stringify(this.producto), {
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                }).then(response => {
-                    console.log(response.status);
-                    this.getAll();
-                }).catch(ex => {
-                    console.log(ex)
-                });
-            } else {
-                console.log("No se pudo editar el producto porque uno de los valores es nulo, indefinido o está vacio");
-            }
-        },
-        /*
-        creacion de nuevos registros
-        (no se pueden crear registros vacios)
-         */
-        createRegistro: function () {
-            this.producto.idMarca = this.marcas.filter(mar => mar.nombreMarca === this.producto.nombreMarca)[0].idMarca;
-            this.producto.idCategoria = this.categorias.filter(cat => cat.nombreCat === this.producto.nombreCategoria)[0].idCategoria;
-            if (this.producto.upc.trim() !== "" && this.producto.stockProd > 0 && this.producto.nombreProd.trim() !== "" && this.producto.idMarca > 0 && this.producto.idCategoria > 0) {
-                console.log(this.producto);
-                axios.post(urlApi, JSON.stringify(this.producto), {
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                }).then(response => {
-                    console.log(response.status);
-                    this.getAll();
-                }).catch(ex => {
-                    console.log(ex)
-                });
-            } else {
-                console.log("No se pudo registrar el producto porque uno de los valores es nulo, indefinido o está vacio");
-            }
-
-        },
-
-        /*
         eliman registros, correspondiente al id seleccionado
          */
         removeRegistro: function (state, producto) {
@@ -266,18 +216,6 @@ export default {
             producto.precioUnit = "";
             producto.precioUnit = cachedProd.precioUnit;
             // this.clearData();
-            let x = 0;
-            if (x === 0) return;
-
-            axios.put(urlApi + "/remove/" + this.producto.upc).then(
-                response => {
-                    this.getAll();
-                    console.log(response.status)
-                }
-            ).catch(ex => {
-                console.log(ex)
-            });
-
         },
         transactionRemove(state, producto) {
             //Si el producto había sido guardado, regresa al queue de guardar
@@ -301,21 +239,6 @@ export default {
             producto.precioUnit = "";
             producto.precioUnit = cachedProd.precioUnit;
         },
-
-        /*
-        recolecta todos los datos al hacer una peticion al api
-         */
-        getAll() {
-            axios.get(urlApi).then(
-                response => {
-                    var prods = response.data;
-                    return prods;
-                }
-            ).catch(ex => {
-                console.log(ex)
-            })
-        },
-
         /*
         limpiando valores de la marca previamente seleccionada
          */

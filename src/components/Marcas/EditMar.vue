@@ -6,9 +6,10 @@
           <label class="col-md-3 form-control-label">Nombre</label>
           <div class="col-md-9">
             <input
+              v-if="marSelected.doc"
               type="text"
               class="form-control"
-              v-model="marSelected.nombreMarca"
+              v-model="marSelected.doc.nombreMarca"
             />
           </div>
         </div>
@@ -17,10 +18,11 @@
           <label class="col-md-3 form-control-label">Descripción</label>
           <div class="col-md-9">
             <textarea
+              v-if="marSelected.doc"
               class="form-control"
               id="exampleFormControlTextarea1"
               rows="3"
-              v-model="marSelected.descripMarca"
+              v-model="marSelected.doc.descripMarca"
             ></textarea>
           </div>
         </div>
@@ -30,28 +32,35 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="edithRegistro(marSelected); ok()"> Guardar </b-button>
+        <b-button
+          size="m"
+          variant="primary"
+          @click="
+            edithRegistro();
+            ok();
+          "
+        >
+          Guardar
+        </b-button>
       </template>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "EditMar",
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
-    ...mapMutations("marcas",["edithRegistro"]),
+    ...mapActions("marcas", ["edithRegistro"]),
   },
   computed: {
-    ...mapState("marcas",["marSelected"]),
+    ...mapState("marcas", ["marSelected"]),
   },
-  mounted() {
-  },
+  mounted() {},
 };
 </script>

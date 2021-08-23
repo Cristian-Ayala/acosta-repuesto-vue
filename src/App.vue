@@ -1,12 +1,17 @@
 <template>
   <div id="app">
+    <InstallPrompt></InstallPrompt>
     <Header @toggleSideBar="isLeftSideBar = !isLeftSideBar"></Header>
     <!-- <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
     </div> -->
     <transition name="fade"
-      ><div class="fondoNegro" v-if="isLeftSideBar" @click="isLeftSideBar = false"></div>
+      ><div
+        class="fondoNegro"
+        v-if="isLeftSideBar"
+        @click="isLeftSideBar = false"
+      ></div>
     </transition>
 
     <div class="d-flex align-items-stretch">
@@ -20,17 +25,27 @@
 <script>
 import Header from "@/components/Header.vue";
 import LeftSideBar from "@/components/Left-SideBar.vue";
+import InstallPrompt from "@/components/InstallPrompt.vue";
+import { mapActions } from "vuex";
 
 export default {
   name: "App",
   components: {
     Header,
     LeftSideBar,
+    InstallPrompt,
   },
   data() {
     return {
       isLeftSideBar: false,
     };
+  },
+  methods:{
+    ...mapActions("marcas", ["initDB"]),
+  },
+  created() {
+    //console.log("App.vue solo se monta una vez, created");
+    this.initDB();
   },
 };
 </script>
