@@ -50,13 +50,13 @@ export default {
     login() {
       this.axios({
         method: "post",
-        url: `${this.$url}_session`,
+        url: `${this.$url}_session/`,
         headers: {
-          "Content-type": "application/json",
         },
         data: { name: this.username, password: this.password },
       })
-        .then(() => {
+        .then((res) => {
+          console.log(res);
           this.$router.push({ path: "/" });
         })
         .catch((error) => {

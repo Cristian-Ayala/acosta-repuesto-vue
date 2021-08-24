@@ -41,16 +41,16 @@ export default {
   },
   created() {
     console.log("App.vue se instanció");
-    // this.initDB();
-    fetch(this.$url + "marcas", {
-      credentials: "include",
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.initDB();
+    // fetch(this.$url + "marcas/", {
+    //   credentials: "include",
+    // })
+    //   .then((res) => {
+    //    res.json().then(console.log)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   },
 };
 </script>
