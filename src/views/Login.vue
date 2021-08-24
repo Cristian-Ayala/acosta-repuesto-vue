@@ -51,8 +51,6 @@ export default {
       this.axios({
         method: "post",
         url: `${this.$url}_session/`,
-        headers: {
-        },
         data: { name: this.username, password: this.password },
       })
         .then((res) => {
