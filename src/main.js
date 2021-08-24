@@ -5,7 +5,7 @@ import store from './store'
 import {
   BootstrapVue
 } from 'bootstrap-vue'
-import App from './App.vue'
+import Layout from './Layout.vue'
 import VueInputAutowidth from 'vue-input-autowidth'
 import VueAWN from "vue-awesome-notifications"
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -23,6 +23,6 @@ Vue.prototype.$url = "https://www.couchdb.me/";
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(Layout)
 }).$mount('#app')
 

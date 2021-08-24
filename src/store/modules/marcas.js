@@ -140,10 +140,11 @@ export default {
             state,
             dispatch
         }) {
-            // console.log(this._vm.$url, " Es el url a la que hacer fetch");
             const remoteMarca = new state.PouchDB(this._vm.$url + "marcas", {
-                headers: {
-                    'Authorization': 'Basic Credentials'
+                fetch: function (url, opts) {
+                    return state.PouchDB.fetch(url, opts, {
+                        credentials: "include"
+                    });
                 }
             });
 
