@@ -2,7 +2,8 @@
   <div id="app">
     <InstallPrompt />
     <Header @toggleSideBar="isLeftSideBar = !isLeftSideBar" />
-    <router-view />
+
+    <div class="d-flex align-items-stretch">
     <transition name="fade"
       ><div
         class="fondoNegro"
@@ -10,11 +11,10 @@
         @click="isLeftSideBar = false"
       ></div>
     </transition>
-
-    <div class="d-flex align-items-stretch">
       <transition name="side-in">
         <LeftSideBar v-if="isLeftSideBar" />
       </transition>
+      <router-view />
     </div>
   </div>
 </template>
@@ -38,19 +38,12 @@ export default {
   },
   methods: {
     ...mapActions("marcas", ["initDB"]),
+    ...mapActions("categorias", ["initDbCategorias"]),
   },
   created() {
     console.log("App.vue se instanció");
     this.initDB();
-    // fetch(this.$url + "marcas/", {
-    //   credentials: "include",
-    // })
-    //   .then((res) => {
-    //    res.json().then(console.log)
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    this.initDbCategorias();
   },
 };
 </script>

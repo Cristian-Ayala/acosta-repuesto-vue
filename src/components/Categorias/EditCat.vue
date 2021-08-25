@@ -6,9 +6,10 @@
           <label class="col-md-3 form-control-label">Nombre</label>
           <div class="col-md-9">
             <input
+            v-if="catSelected.doc"
               type="text"
               class="form-control"
-              v-model="catSelected.nombreCategoria"
+              v-model="catSelected.doc.nombreCategoria"
             />
           </div>
         </div>
@@ -17,10 +18,11 @@
           <label class="col-md-3 form-control-label">Descripción</label>
           <div class="col-md-9">
             <textarea
+            v-if="catSelected.doc"
               class="form-control"
               id="exampleFormControlTextarea1"
               rows="3"
-              v-model="catSelected.descripcion"
+              v-model="catSelected.doc.descripcion"
             ></textarea>
           </div>
         </div>
@@ -30,14 +32,14 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="edithRegistro(catSelected); ok()"> Guardar </b-button>
+        <b-button size="m" variant="primary" @click="edithRegistro(); ok()"> Guardar </b-button>
       </template>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "EditCat",
@@ -46,7 +48,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("categorias",["edithRegistro"]),
+    ...mapActions("categorias",["edithRegistro"]),
   },
   computed: {
     ...mapState("categorias",["catSelected"]),

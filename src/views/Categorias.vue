@@ -40,15 +40,15 @@
                   <th>Operaciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody v-if="categorias">
                 <tr
                   v-for="(cat, index) in categorias"
-                  v-show="filtro(index) && cat.activoCat === true"
+                  v-show="filtro(index) && cat.doc.activoCat === true"
                   :key="index"
                 >
                   <th scope="row" class="onlyOnWeb">{{ index + 1 }}</th>
-                  <td>{{ cat.nombreCategoria }}</td>
-                  <td class="onlyOnWeb">{{ cat.descripcion }}</td>
+                  <td>{{ cat.doc.nombreCategoria }}</td>
+                  <td class="onlyOnWeb">{{ cat.doc.descripcion }}</td>
                   <td>
                     <b-button
                       v-b-modal.modal-delete
@@ -70,6 +70,11 @@
                 </tr>
               </tbody>
             </table>
+            <b-skeleton-table
+              :rows="5"
+              :columns="windowWidth >= 650 ? 4 : 2"
+              v-if="categorias.length === 0"
+            ></b-skeleton-table>
           </div>
         </div>
       </div>
@@ -98,17 +103,24 @@ export default {
       displayOption: "",
       searchDisplay: "",
       urlApi: `http://localhost:8080/categoria`,
+      windowWidth: window.innerWidth,
     };
   },
   methods: {
     ...mapMutations("categorias", ["clearDataCat", "getCategoriaSelected"]),
-    filtro(valor) {
+    filtro(index) {
       if (this.searchDisplay === "") return true;
       let array = (
-        this.categorias[valor].nombreCat + this.categorias[valor].descripcion
+        this.categorias[index].doc.nombreCat +
+        this.categorias[index].doc.descripcion
       ).toUpperCase();
       return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
     },
+  },
+  mounted() {
+    window.onresize = () => {
+      this.windowWidth = window.innerWidth;
+    };
   },
   computed: {
     ...mapState("categorias", ["categorias", "categoria"]),

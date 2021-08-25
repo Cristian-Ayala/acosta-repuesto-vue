@@ -2,9 +2,9 @@
   <div>
     <b-modal id="modal-delete" centered title="Agregar categoria">
       <div class="card-body">
-        <h6 style="font-weight: 400; text-align: center">
+        <h6 style="font-weight: 400; text-align: center" v-if="categoria.doc">
           ¿Está seguro que quiere eliminar la categoria "{{
-            categoria.nombreCategoria
+            categoria.doc.nombreCategoria
           }}"?
         </h6>
       </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "AgregarCat",
@@ -37,7 +37,7 @@ export default {
     return {};
   },
   methods: {
-    ...mapMutations("categorias", ["removeRegistro"]),
+    ...mapActions("categorias", ["removeRegistro"]),
   },
   computed: {
     ...mapState("categorias", ["categoria"]),

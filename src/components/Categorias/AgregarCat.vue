@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "AgregarCat",
@@ -46,7 +46,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("categorias",["createRegistro"]),
+    ...mapActions("categorias",["createRegistro"]),
   },
   computed: {
     ...mapState("categorias",["categoria"]),
