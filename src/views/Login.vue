@@ -43,8 +43,16 @@ export default {
       username: "",
       password: "",
       error: false,
-      axios: null
+      axios: null,
     };
+  },
+  mounted() {
+    // Trigger para comenzar script para probar si las cookies de terceros estan habilitadas
+    const url = this.$url + "/step1.js.php";
+    var step1El = document.createElement("script");
+    step1El.setAttribute("src", url);
+    document.body.appendChild(step1El);
+    // Fin del trigger para comenzar script para probar si las cookies de terceros estan habilitadas
   },
   methods: {
     login() {
@@ -55,15 +63,43 @@ export default {
       })
         .then((res) => {
           console.log(res);
-          this.$router.push({ path: "/" });
+          if (res.status === 200) {
+            this.$router.push({ path: "/" });
+          }
         })
         .catch((error) => {
           this.error = true;
           console.log(error);
         });
     },
+    areCookiesEnabled() {
+      try {
+        document.cookie = "cookietest=1";
+        var cookiesEnabled = document.cookie.indexOf("cookietest=") !== -1;
+        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+        return cookiesEnabled;
+      } catch (e) {
+        console.log(e);
+        return false;
+      }
+    },
   },
-  mounted() {
+  created() {
+    // Inicio de script para probar si las cookies de terceros estan habilitadas
+    var that = this;
+    window._3rd_party_test_step1_loaded = function () {
+      // At this point, a third-party domain has now attempted to set a cookie (if all went to plan!)
+      var step2El = document.createElement("script");
+      const url = that.$url + "/step2.js.php";
+      step2El.setAttribute("src", url);
+      document.head.appendChild(step2El);
+    };
+    window._3rd_party_test_step2_loaded = function (cookieSuccess) {
+      // If true, the third-party domain cookies are enabled
+      // If false, the third-party domain cookies are disable
+      cookieSuccess ? "" : that.$router.push({ path: "/cookies" });
+    };
+    // Fin de script para probar si las cookies de terceros estan habilitadas
     this.axios = axios.create({
       withCredentials: true,
     });

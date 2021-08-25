@@ -35,10 +35,16 @@ const routes = [{
     path: '/login',
     component: () => import('../Layout.vue'),
     children: [{
-      path: '/',
-      name: 'Login',
-      component: () => import('../views/Login.vue')
-    }]
+        path: '/',
+        name: 'Login',
+        component: () => import('../views/Login.vue')
+      },
+      {
+        path: '/cookies',
+        name: 'Cookies',
+        component: () => import('../views/Cookies.vue')
+      }
+    ]
   }
 ]
 

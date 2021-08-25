@@ -1,3 +1,4 @@
+import router from '../../router/index'
 var PouchDB = require('pouchdb').default;
 PouchDB.plugin(require('pouchdb-find').default);
 export default {
@@ -145,6 +146,12 @@ export default {
                     return state.PouchDB.fetch(url, opts, {
                         credentials: "include"
                     });
+                }
+            });
+            remoteMarca.info().catch(err => {
+                if (err.status === 401) {
+                    console.log("no autorizado");
+                    router.push({ path: "/login" })
                 }
             });
 

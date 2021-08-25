@@ -19,6 +19,8 @@ Vue.config.silent = true
 
 // Vue.prototype.$PouchDB = require('pouchdb');
 Vue.prototype.$url = "https://www.couchdb.me/";
+// To verify if third party cookies are enabled
+Vue.prototype.$cookieCheck = "http://143.198.117.182";
 
 new Vue({
   router,
