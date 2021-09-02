@@ -383,7 +383,6 @@ export default {
   },
   methods: {
     ...mapMutations("ordenes", [
-      "getProductoSelected",
       "change",
       "decProducto",
       "incProducto",

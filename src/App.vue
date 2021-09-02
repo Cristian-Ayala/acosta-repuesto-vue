@@ -4,13 +4,13 @@
     <Header @toggleSideBar="isLeftSideBar = !isLeftSideBar" />
 
     <div class="d-flex align-items-stretch">
-    <transition name="fade"
-      ><div
-        class="fondoNegro"
-        v-if="isLeftSideBar"
-        @click="isLeftSideBar = false"
-      ></div>
-    </transition>
+      <transition name="fade"
+        ><div
+          class="fondoNegro"
+          v-if="isLeftSideBar"
+          @click="isLeftSideBar = false"
+        ></div>
+      </transition>
       <transition name="side-in">
         <LeftSideBar v-if="isLeftSideBar" />
       </transition>
@@ -39,11 +39,13 @@ export default {
   methods: {
     ...mapActions("marcas", ["initDB"]),
     ...mapActions("categorias", ["initDbCategorias"]),
+    ...mapActions("productos", ["initDbProductos"]),
   },
   created() {
     console.log("App.vue se instanció");
     this.initDB();
     this.initDbCategorias();
+    this.initDbProductos();
   },
 };
 </script>

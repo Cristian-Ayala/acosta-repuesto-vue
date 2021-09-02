@@ -159,7 +159,7 @@ export default {
                     console.log("no autorizado");
                     router.push({
                         path: "/login"
-                    })
+                    }).catch(()=>{});
                 }
             });
 

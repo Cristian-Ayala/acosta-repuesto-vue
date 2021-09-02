@@ -178,9 +178,6 @@ export default {
                 "totalOrden": 0
             }
         },
-        getProductoSelected(prod) {
-            this.producto = prod;
-        },
         filtro(valor) {
             if (this.searchDisplay === "") return true;
             let array = (this.ordenes[valor].idOrden + this.ordenes[valor].observacionesOrden + this.ordenes[valor].totalOrden + this.ordenes[valor].nombreCliente).toUpperCase();
@@ -192,17 +189,6 @@ export default {
             if (state.prodSearch === "") return true;
             let array = (this.marcas.filter(mar => mar.idMarca === this.productos[valor].idMarca)[0].nombreMarca + this.categorias.filter(cat => cat.idCategoria === this.productos[valor].idCategoria)[0].nombreCat + this.productos[valor].nombreProd + this.productos[valor].descripcion + this.productos[valor].precioUnit + this.productos[valor].stockProd + this.productos[valor].upc).toUpperCase();
             return array.indexOf(this.prodSearch.toUpperCase()) >= 0;
-        },
-        showEditing: function (input) {
-            // Get the value from the input
-            var value = input.value;
-            // Get the matching `option` element from the `datalist` (which is
-            // available via `input.list`)
-            var option = Array.prototype.find.call(input.list.options, function (option) {
-                return option.value === value;
-            });
-            // Get its `data-id` attribute value
-            console.log(option.getAttribute("data-id"));
         },
         doubleClick: function () {
             const btndetOrd = document.getElementById("btnDetOrden");

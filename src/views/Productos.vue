@@ -31,9 +31,20 @@
             <!-- end of mobile action -->
           </div>
           <div v-if="windowWidth < 1000" style="padding: 1rem">
+            <div class="mt-3">
+              <b-pagination
+                v-model="currentPageLocal"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                pills
+                align="center"
+                aria-controls="#"
+              >
+              </b-pagination>
+            </div>
             <b-card
               v-for="prod in productos"
-              :img-src="prod.foto"
+              :img-src="prod.doc.foto"
               img-alt="Card image"
               img-top
               border-variant="dark"
@@ -42,13 +53,17 @@
               :key="prod.upc"
             >
               <b-card-text>
-                <h5>{{ prod.nombreProd }}</h5>
-                UPC: {{ prod.upc }}<br />
-                Precio: <b>${{ prod.precioUnit }}</b
+                <h5>{{ prod.doc.nombreProd }}</h5>
+                UPC: {{ prod.doc.upc }}<br />
+                P.M.: <b>${{ prod.doc.precioMayoreo }}</b
                 ><br />
-                Stock: {{ prod.stockProd }}<br />
-                Marca: {{ prod.nombreMarca }}<br />
-                Categoria:{{ prod.nombreCategoria }}<br />
+                P.P.: <b>${{ prod.doc.precioPublico }}</b
+                ><br />
+                P.T.: <b>${{ prod.doc.precioTaller }}</b
+                ><br />
+                Stock: {{ prod.doc.stockProd }}<br />
+                Marca: {{ prod.doc.nombreMarca }}<br />
+                Categoria: {{ prod.doc.nombreCategoria }}<br />
                 <!-- for mobile action -->
                 <b-button
                   v-b-modal.addEditProdMovile
@@ -97,7 +112,7 @@
 
             <b-nav tabs fill>
               <b-nav-item
-                v-for="cat in catActivas"
+                v-for="cat in categorias"
                 :key="cat.nombreCategoria"
                 :active="tab === cat.nombreCategoria"
                 @click="tab = cat.nombreCategoria"
@@ -374,7 +389,7 @@
 import ConfirmarTransacciones from "@/components/Productos/ConfirmarTransacciones.vue";
 import EliminarProdMovil from "@/components/Productos/EliminarProdMovil.vue";
 import AddEditProdMovile from "@/components/Productos/AddEditProdMovile.vue";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
   name: "Productos",
@@ -389,9 +404,9 @@ export default {
       searchDisplay: "",
       urlApi: `http://localhost:8080/categoria`,
       tab: "",
-      catActivas: [],
       windowWidth: window.innerWidth,
       title: "Editar",
+      currentPageLocal: 1,
     };
   },
   methods: {
@@ -407,6 +422,13 @@ export default {
       "saveNewProduct",
       "editNewRegistro",
       "prodSelected",
+    ]),
+    ...mapActions("productos", [
+      "firstPage",
+      "lastPage",
+      "nextPage",
+      "prevPage",
+      "setPage",
     ]),
 
     filtro(valor) {
@@ -432,6 +454,9 @@ export default {
       "editTransaction",
       "numeroDeEditados",
       "newProductMobile",
+      "currentPage",
+      "perPage",
+      "totalRows",
     ]),
     ...mapState("categorias", ["categorias"]),
     // funcion que evalua si hay algun dato en cache para que el boton de "Aplicar Cambios" se muestre
@@ -456,15 +481,18 @@ export default {
     hook para inicializar los valores de la tabla
      */
   mounted() {
-    //para setear como active el tab del inicio
-    this.tab = this.categorias[0].nombreCategoria;
-    this.catActivas = this.categorias.filter((cat) => cat.activoCat);
-    // this.productos = this.productos.forEach((prod) => (prod.edit = false));
-    //this.getAll();
+    //para setear como active el tab del inicio -------------- No funciona porque no se han traido los datos (hacer esto en el store)
+    // console.log("Esto es lo que hay al mounted",this.categorias[0].doc.nombreCategoria);
+    // this.tab = this.categorias[0].doc.nombreCategoria;
     window.onresize = () => {
       this.windowWidth = window.innerWidth;
     };
   },
+  watch: {
+    currentPageLocal: function (valor) {
+      this.setPage(valor);
+    },
+  }
 };
 </script>
 <style scoped>
@@ -550,7 +578,7 @@ td input {
     display: inline-flex;
   }
   .cardProductosMobile img {
-    width: 150px;
+    /* width: 150px; */
     align-self: center;
   }
 }

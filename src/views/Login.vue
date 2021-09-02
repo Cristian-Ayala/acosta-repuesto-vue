@@ -62,7 +62,6 @@ export default {
         data: { name: this.username, password: this.password },
       })
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
             this.$router.push({ path: "/" });
           }

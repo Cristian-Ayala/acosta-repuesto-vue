@@ -151,7 +151,9 @@ export default {
             remoteMarca.info().catch(err => {
                 if (err.status === 401) {
                     console.log("no autorizado");
-                    router.push({ path: "/login" })
+                    router.push({
+                        path: "/login"
+                    }).catch(() => {});
                 }
             });
 

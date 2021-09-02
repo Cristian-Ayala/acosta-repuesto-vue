@@ -100,7 +100,8 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("ordenes", ["getProductoSelected"]),
+    //Esto es invento xD
+    ...mapMutations("ordenes", ["getOrdenSelected"]),
   },
   computed: {
     ...mapState("ordenes", ["ordSelected", "showDetOrd"]),
