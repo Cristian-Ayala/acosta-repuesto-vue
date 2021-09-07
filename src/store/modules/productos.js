@@ -43,23 +43,27 @@ export default {
     },
     mutations: {
         prodSelected(state, productoSelected) {
+            // console.log(JSON.parse(JSON.stringify(productoSelected)));
             // check if empty, if it is -> set array with format
             if (!Object.keys(productoSelected).length) {
                 productoSelected = {
-                    nombreProd: "",
-                    activoProd: true,
-                    precioUnit: 0,
-                    stockProd: 0,
-                    upc: "",
-                    nombreMarca: "",
-                    nombreCategoria: "",
-                    foto: "",
-                    precioTaller: 0,
-                    precioMayoreo: 0,
-                    precioPublico: 0,
+                    doc: {
+                        nombreProd: "",
+                        activoProd: true,
+                        precioUnit: 0,
+                        stockProd: 0,
+                        upc: "",
+                        nombreMarca: "",
+                        nombreCategoria: "",
+                        foto: "",
+                        precioTaller: 0,
+                        precioMayoreo: 0,
+                        precioPublico: 0,
+                    }
                 };
             }
-            state.newProductMobile = productoSelected;
+            // state.newProductMobile = {};
+            state.newProductMobile = JSON.parse(JSON.stringify(productoSelected));
             // this.commit("productos/undoEditProd", state)            
         },
         // -------------------- Here is were CRUD methods for mobile start --------------------
@@ -303,6 +307,7 @@ export default {
         }, producto) {
             if (producto.length === 1) {
                 //Single add 
+                console.log(producto)
             } else if (producto.length > 1) {
                 //bulk operation
                 //For puchDB we need to add an _id field 
@@ -340,80 +345,11 @@ export default {
                 }
             }).catch(console.log);
         },
-        lastPage({
-            state,
-            dispatch
-        }) {
-            state.optionsPagination.skip = 0;
-            state.optionsPagination.descending = true;
-            state.optionsPagination.startkey = null;
-            state.currentPage = Math.ceil(state.totalRows / state.perPage);
-            //numer of pages full of products
-            var pagesFullofProducts = Math.trunc(state.totalRows / state.perPage);
-            //calculate new limit
-            var newLimit = state.totalRows - (state.perPage * pagesFullofProducts);
-            state.optionsPagination.limit = newLimit;
-            dispatch("readProducto");
+        updateProducto({
+            state
+        }, producto) {
+            console.log("metodo update",producto, state._vm);
         },
-        firstPage({
-            state,
-            dispatch
-        }) {
-            state.optionsPagination.skip = 0;
-            state.currentPage = 1;
-            state.optionsPagination.descending = false;
-            state.optionsPagination.startkey = null;
-            dispatch("readProducto");
-        },
-        nextPage({
-            state,
-            dispatch
-        }, page) {
-            state.currentPage = page;
-            var lastPage = Math.ceil(state.totalRows / state.perPage);
-            if (state.currentPage < lastPage) {
-                state.optionsPagination.skip = 1;
-                state.optionsPagination.descending = false;
-                state.optionsPagination.startkey = state.paginationHelper.lastDoc;
-                dispatch("readProducto");
-            } else if (lastPage === state.currentPage) {
-                dispatch("lastPage");
-            }
-        },
-        prevPage({
-            state,
-            dispatch
-        }, page) {
-            state.currentPage = page;
-            if (state.currentPage > 1) {
-                state.optionsPagination.descending = true;
-                state.optionsPagination.skip = 1;
-                state.optionsPagination.startkey = state.paginationHelper.firstDoc;
-                dispatch("readProducto");
-            } else if (state.currentPage === 1) {
-                dispatch("firstPage");
-            }
-        },
-        setPage({
-            state,
-            dispatch
-        }, page) {
-            state.optionsPagination.limit = state.perPage;
-            if (page === 1) {
-                dispatch("firstPage");
-            } else if (page < state.currentPage) {
-                dispatch("prevPage", page);
-            } else if (page > state.currentPage) {
-                dispatch("nextPage", page);
-            }
-        },
-        // updateProducto({
-        //     state,
-        //     commit,
-        //     dispatch
-        // }, producto) {
-        //     console.log("metodo update");
-        // },
         // deleteProducto({
         //     state,
         //     commit,
@@ -528,6 +464,93 @@ export default {
                         console.log("totally unhandled error (shouldn't happen)", err);
                     });
             })
+        },
+        // ----------------------- Start of pagination -----------------------
+        lastPage({
+            state,
+            dispatch
+        }) {
+            state.optionsPagination.skip = 0;
+            state.optionsPagination.descending = true;
+            state.optionsPagination.startkey = null;
+            state.currentPage = Math.ceil(state.totalRows / state.perPage);
+            //numer of pages full of products
+            var pagesFullofProducts = Math.trunc(state.totalRows / state.perPage);
+            //calculate new limit
+            var newLimit = state.totalRows - (state.perPage * pagesFullofProducts);
+            state.optionsPagination.limit = newLimit;
+            dispatch("readProducto");
+        },
+        firstPage({
+            state,
+            dispatch
+        }) {
+            state.optionsPagination.skip = 0;
+            state.currentPage = 1;
+            state.optionsPagination.descending = false;
+            state.optionsPagination.startkey = null;
+            dispatch("readProducto");
+        },
+        nextPage({
+            state,
+            dispatch
+        }, page) {
+            state.currentPage = page;
+            var lastPage = Math.ceil(state.totalRows / state.perPage);
+            if (state.currentPage < lastPage) {
+                state.optionsPagination.skip = 1;
+                state.optionsPagination.descending = false;
+                state.optionsPagination.startkey = state.paginationHelper.lastDoc;
+                dispatch("readProducto");
+            } else if (lastPage === state.currentPage) {
+                dispatch("lastPage");
+            }
+        },
+        prevPage({
+            state,
+            dispatch
+        }, page) {
+            state.currentPage = page;
+            if (state.currentPage > 1) {
+                state.optionsPagination.descending = true;
+                state.optionsPagination.skip = 1;
+                state.optionsPagination.startkey = state.paginationHelper.firstDoc;
+                dispatch("readProducto");
+            } else if (state.currentPage === 1) {
+                dispatch("firstPage");
+            }
+        },
+        setPage({
+            state,
+            dispatch
+        }, page) {
+            state.optionsPagination.limit = state.perPage;
+            if (page === 1) {
+                dispatch("firstPage");
+            } else if (page < state.currentPage) {
+                dispatch("prevPage", page);
+            } else if (page > state.currentPage) {
+                dispatch("nextPage", page);
+            }
+        },
+        // ----------------------- End of pagination -----------------------
+        /**
+         * Called from AddEditProdMovile when clicked on "confirmar" 
+         * Decides whether the transaction belongs to a new product (creates it)
+         * or if the product has to be updated
+         * @param {vuex} param0 
+         * @param {product} producto 
+         */
+        confirmation({
+            dispatch
+        },producto){
+            console.log("Confirmation: ",producto);
+            //Verify in confirmation is for update o create new
+            if (producto.id) {
+                dispatch("updateProducto",[producto])                
+            }else{
+                dispatch("createProducto",[producto])                
+            }
         },
         // createIndexs({
         //     state,

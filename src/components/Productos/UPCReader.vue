@@ -7,7 +7,7 @@
         v-if="!barcode"
       ></StreamBarcodeReader>
       <span v-if="barcode"
-        >¿Es este el UPC: <b>{{ newProductMobile.upc }}</b
+        >¿Es este el UPC: <b>{{ newProductMobile.doc.upc }}</b
         >?</span
       >
       <template #modal-footer="{ ok, hide }">
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     onDecode(a) {
-      this.newProductMobile.upc = a;
+      this.newProductMobile.doc.upc = a;
       this.barcode = a;
     },
     onLoaded() {

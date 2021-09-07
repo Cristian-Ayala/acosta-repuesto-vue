@@ -424,10 +424,6 @@ export default {
       "prodSelected",
     ]),
     ...mapActions("productos", [
-      "firstPage",
-      "lastPage",
-      "nextPage",
-      "prevPage",
       "setPage",
     ]),
 

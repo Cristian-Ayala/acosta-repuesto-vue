@@ -6,11 +6,11 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
           <div class="col-md-9"></div>
-          <div class="col-md-9 input-group">
+          <div class="col-md-9 input-group" v-if="newProductMobile.doc">
             <input
               type="text"
               class="form-control"
-              v-model="newProductMobile.upc"
+              v-model="newProductMobile.doc.upc"
             /><span
               class="input-group-text"
               v-b-modal.barCode
@@ -23,11 +23,11 @@
         <!-------------------------------------------- -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Nombre</label>
-          <div class="col-md-9">
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <input
               type="text"
               class="form-control"
-              v-model="newProductMobile.nombreProd"
+              v-model="newProductMobile.doc.nombreProd"
             />
           </div>
         </div>
@@ -35,10 +35,10 @@
         <!-------------------------------------------- -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Foto:</label>
-          <div class="col-md-9">
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <input
               type="file"
-              accept="image/x-png,image/jpeg"
+              accept="image/x-png,image/jpeg,image/webp"
               id="uploadPictures"
               @change="upload()"
               v-if="!imagePreview"
@@ -56,7 +56,7 @@
         <!-------------------------------------------- -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Marca</label>
-          <div class="col-md-9">
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <b-dropdown
               :text="marcaDropdown"
               split
@@ -68,9 +68,9 @@
               <b-dropdown-item
                 href="#"
                 v-for="marca in marcas"
-                :key="marca.nombreMarca"
-                @click="marcaSel(marca)"
-                >{{ marca.nombreMarca }}</b-dropdown-item
+                :key="marca.doc.nombreMarca"
+                @click="marcaSel(marca.doc)"
+                >{{ marca.doc.nombreMarca }}</b-dropdown-item
               >
               <b-button
                 v-b-modal.modalAgregarMar
@@ -86,7 +86,7 @@
         <!-------------------------------------------- -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Categoria</label>
-          <div class="col-md-9">
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <b-dropdown
               :text="descripcionDropdown"
               split
@@ -98,9 +98,9 @@
               <b-dropdown-item
                 href="#"
                 v-for="categoria in categorias"
-                :key="categoria.nombreCategoria"
-                @click="catSel(categoria)"
-                >{{ categoria.nombreCategoria }}</b-dropdown-item
+                :key="categoria.doc.nombreCategoria"
+                @click="catSel(categoria.doc)"
+                >{{ categoria.doc.nombreCategoria }}</b-dropdown-item
               >
               <b-button
                 v-b-modal.modal-1
@@ -115,12 +115,40 @@
         <div class="line"></div>
         <!-------------------------------------------- -->
         <div class="form-group row">
-          <label class="col-md-3 form-control-label">Precio Unitario:</label>
-          <div class="col-md-9">
+          <label class="col-md-3 form-control-label">Precio Mayorista:</label>
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <input
               type="number"
               class="form-control"
-              v-model="newProductMobile.precioUnit"
+              v-model="newProductMobile.doc.precioMayoreo"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="line"></div>
+        <!-------------------------------------------- -->
+        <!-------------------------------------------- -->
+        <div class="form-group row">
+          <label class="col-md-3 form-control-label">Precio Público:</label>
+          <div class="col-md-9" v-if="newProductMobile.doc">
+            <input
+              type="number"
+              class="form-control"
+              v-model="newProductMobile.doc.precioPublico"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="line"></div>
+        <!-------------------------------------------- -->
+        <!-------------------------------------------- -->
+        <div class="form-group row">
+          <label class="col-md-3 form-control-label">Precio Taller:</label>
+          <div class="col-md-9" v-if="newProductMobile.doc">
+            <input
+              type="number"
+              class="form-control"
+              v-model="newProductMobile.doc.precioTaller"
               min="0"
             />
           </div>
@@ -129,11 +157,12 @@
         <!-------------------------------------------- -->
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Stock:</label>
-          <div class="col-md-9">
+          <div class="col-md-9" v-if="newProductMobile.doc">
             <b-form-spinbutton
               id="decrementIncrement"
-              v-model="newProductMobile.stockProd"
+              v-model="newProductMobile.doc.stockProd"
               min="0"
+              max="1000000"
             ></b-form-spinbutton>
           </div>
         </div>
@@ -149,8 +178,7 @@
           variant="success"
           @click="
             ok();
-            removeRegistro(newProductMobile);
-            applyAllChanges();
+            confirmation(newProductMobile);
           "
         >
           Confirmar
@@ -164,7 +192,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 import { blobToURL, fromBlob } from "image-resize-compress";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
@@ -192,6 +220,9 @@ export default {
   },
   methods: {
     ...mapMutations("productos", ["removeRegistro", "applyAllChanges"]),
+    ...mapActions("productos", [
+      "confirmation",
+    ]),
     ...mapMutations("marcas", ["clearData"]),
     ...mapMutations("categorias", ["clearDataCat"]),
     upload() {
@@ -242,28 +273,28 @@ export default {
     newProductMobile: {
       // This will let Vue know to look inside the array
       handler() {
-        if (this.newProductMobile) {
-          if (this.newProductMobile.nombreCategoria) {
-            this.descripcionDropdown = this.newProductMobile.nombreCategoria;
+        if (this.newProductMobile.doc) {
+          if (this.newProductMobile.doc.nombreCategoria) {
+            this.descripcionDropdown = this.newProductMobile.doc.nombreCategoria;
           }else{
             this.descripcionDropdown = "";
           }
-          if (this.newProductMobile.nombreMarca) {
-            this.marcaDropdown = this.newProductMobile.nombreMarca;
+          if (this.newProductMobile.doc.nombreMarca) {
+            this.marcaDropdown = this.newProductMobile.doc.nombreMarca;
           }else{
             this.marcaDropdown = ""
           }
-          if (this.newProductMobile.foto) {
-            this.imagePreview = this.newProductMobile.foto;
+          if (this.newProductMobile.doc.foto) {
+            this.imagePreview = this.newProductMobile.doc.foto;
           }else{
             this.imagePreview = ""
           }
         }
       },
     },
-    barcode() {
-      this.newProductMobile = this.barcode;
-    },
+    // barcode() {
+    //   this.newProductMobile = this.barcode;
+    // },
   },
 };
 </script>
