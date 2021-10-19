@@ -383,13 +383,28 @@ export default {
                 //bulk operation for desktop
             }
         },
-        // deleteProducto({
-        //     state,
-        //     commit,
-        //     dispatch
-        // }, producto) {
-        //     console.log("metodo delete");
-        // },
+        deleteProducto({
+            state,
+            commit,
+            dispatch
+        }, producto) {
+            console.log(producto);
+            producto.doc._deleted = true;
+            producto.doc.activoProd=false;
+            state.localProductos.put(producto.doc).then(() => {
+                dispatch('readProducto').then(() => commit("successNotification", {
+                    "message": "Producto eliminado con éxito",
+                    "tittle": "EXITO",
+                    "duration": 4000
+                }));
+
+            }).catch((err) => {
+                commit("alertNotification", {
+                    "message": "Error al eliminar el producto<br>" + err,
+                    "duration": 8000
+                });
+            });
+        },
 
         /**
          * 

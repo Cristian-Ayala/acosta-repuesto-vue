@@ -2,9 +2,9 @@
   <div>
     <!-- inicio del modal para eliminar (mobile) -->
     <b-modal id="deleteProduc" title="Eliminar Producto" centered>
-      <p class="my-4" v-if="newProductMobile">
+      <p class="my-4" v-if="newProductMobile.doc">
         ¿Seguro quiere eliminar el producto:
-        {{ newProductMobile.nombreProd }}?
+        {{ newProductMobile.doc.nombreProd }}?
       </p>
       <template #modal-footer="{ ok, cancel }">
         <b-button size="sm" variant="danger" @click="cancel()">
@@ -15,8 +15,7 @@
           variant="success"
           @click="
             ok();
-            removeRegistro(newProductMobile);
-            applyAllChanges();
+            deleteProducto(newProductMobile);
           "
         >
           Si
@@ -27,14 +26,14 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "EliminarProdMovil",
   methods: {
-    ...mapMutations("productos", [
-      "removeRegistro",
-      "applyAllChanges"
+    ...mapActions("productos", [
+      "deleteProducto",
+      // "applyAllChanges"
     ]),
   },
   computed: {
