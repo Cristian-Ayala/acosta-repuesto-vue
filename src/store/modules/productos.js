@@ -355,9 +355,33 @@ export default {
             }).catch(console.log);
         },
         updateProducto({
-            state
+            state,
+            commit,
+            dispatch
         }, producto) {
-            console.log("metodo update", producto, state._vm);
+            if (producto.length === 1) {
+                //Single add 
+                console.log(producto[0].doc)
+                var productoDoc = producto[0].doc;
+                productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
+                productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
+                productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
+                state.localProductos.put(productoDoc).then(() => {
+                    dispatch('readProducto').then(() => commit("successNotification", {
+                        "message": "Producto modificado con éxito",
+                        "tittle": "EXITO",
+                        "duration": 4000
+                    }));
+
+                }).catch((err) => {
+                    commit("alertNotification", {
+                        "message": "Error al modificar el producto<br>" + err,
+                        "duration": 8000
+                    });
+                });
+            } else if (producto.length > 1) {
+                //bulk operation for desktop
+            }
         },
         // deleteProducto({
         //     state,
