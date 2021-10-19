@@ -8,7 +8,6 @@ export default {
         producto: {
             nombreProd: "",
             activoProd: true,
-            precioUnit: null,
             stockProd: null,
             upc: null,
             nombreMarca: "",
@@ -50,7 +49,6 @@ export default {
                     doc: {
                         nombreProd: "",
                         activoProd: true,
-                        precioUnit: 0,
                         stockProd: 0,
                         upc: "",
                         nombreMarca: "",
@@ -113,7 +111,6 @@ export default {
             var producto = {
                 nombreProd: "",
                 activoProd: true,
-                precioUnit: 0,
                 stockProd: 0,
                 upc: "",
                 nombreMarca: "",
@@ -127,7 +124,6 @@ export default {
                 //Cuando se quiera guardar, se pondrá en true lo que no cumpla con el formato para darle a conocer al usuario que campo está mal escrito
                 format: {
                     nombreProd: false,
-                    precioUnit: false,
                     stockProd: false,
                     upc: false,
                     nombreMarca: false,
@@ -239,8 +235,8 @@ export default {
             producto.delete = true;
             // Assign a value and reassign it is just for detection purposes, 
             // see more here: https://vuejs.org/v2/guide/reactivity.html#Change-Detection-Caveats
-            producto.precioUnit = "";
-            producto.precioUnit = cachedProd.precioUnit;
+            producto.upc = "";
+            producto.upc = cachedProd.upc;
         },
         /**
          * Undo delete transacion
@@ -269,8 +265,8 @@ export default {
             // console.log(JSON.parse(JSON.stringify(state.deleteTransaction)));
             // Assign a value and reassign it is just for detection purposes, 
             // see more here: https://vuejs.org/v2/guide/reactivity.html#Change-Detection-Caveats
-            producto.precioUnit = "";
-            producto.precioUnit = cachedProd.precioUnit;
+            producto.upc = "";
+            producto.upc = cachedProd.upc;
         },
         // -------------------- Here is were CRUD methods for desktop ends --------------------
 
@@ -298,6 +294,16 @@ export default {
                 }
             });
         },
+        marcaSelected(state, marca) {
+            state.newProductMobile.doc.nombreMarca = marca;
+        },
+        categoriaSelected(state, categoria) {
+            state.newProductMobile.doc.nombreCategoria = categoria;
+        },
+        fotoSelected(state, foto) {
+            state.newProductMobile.doc.foto = foto;
+        },
+
     },
     actions: {
         createProducto({
@@ -307,24 +313,27 @@ export default {
         }, producto) {
             if (producto.length === 1) {
                 //Single add 
-                console.log(producto)
-            } else if (producto.length > 1) {
-                //bulk operation
-                //For puchDB we need to add an _id field 
-                state.categoria._id = new Date().toISOString();
-                state.localProductos.put(state.categoria).then(() => {
+                console.log(producto[0].doc)
+                var productoDoc = producto[0].doc;
+                productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
+                productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
+                productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
+                productoDoc._id = new Date().toISOString(); //For puchDB we need to add an _id field 
+                state.localProductos.put(productoDoc).then(() => {
                     dispatch('readProducto').then(() => commit("successNotification", {
-                        "message": "Producto agregada con éxito",
+                        "message": "Producto agregado con éxito",
                         "tittle": "EXITO",
                         "duration": 4000
                     }));
 
                 }).catch((err) => {
                     commit("alertNotification", {
-                        "message": "Error al guardar la categoria<br>" + err,
-                        "duration": 4000
+                        "message": "Error al guardar el producto<br>" + err,
+                        "duration": 8000
                     });
                 });
+            } else if (producto.length > 1) {
+                //bulk operation for desktop
             }
         },
         readProducto({
@@ -348,7 +357,7 @@ export default {
         updateProducto({
             state
         }, producto) {
-            console.log("metodo update",producto, state._vm);
+            console.log("metodo update", producto, state._vm);
         },
         // deleteProducto({
         //     state,
@@ -543,13 +552,13 @@ export default {
          */
         confirmation({
             dispatch
-        },producto){
-            console.log("Confirmation: ",producto);
+        }, producto) {
+            console.log("Confirmation: ", producto);
             //Verify in confirmation is for update o create new
             if (producto.id) {
-                dispatch("updateProducto",[producto])                
-            }else{
-                dispatch("createProducto",[producto])                
+                dispatch("updateProducto", [producto])
+            } else {
+                dispatch("createProducto", [producto])
             }
         },
         // createIndexs({

@@ -45,7 +45,7 @@
               style="color: transparent"
             />
             <div class="image-preview-container" v-if="imagePreview">
-              <img class="image-preview" :src="imagePreview" alt="Picture" />
+              <img class="image-preview" :src="imagePreview" alt="Picture" width="150" height="100%"/>
               <b-button variant="danger" @click="imagePreview = ''"
                 >Quitar</b-button
               >
@@ -219,10 +219,14 @@ export default {
     };
   },
   methods: {
-    ...mapMutations("productos", ["removeRegistro", "applyAllChanges"]),
-    ...mapActions("productos", [
-      "confirmation",
+    ...mapMutations("productos", [
+      "removeRegistro",
+      "applyAllChanges",
+      "marcaSelected",
+      "categoriaSelected",
+      "fotoSelected",
     ]),
+    ...mapActions("productos", ["confirmation"]),
     ...mapMutations("marcas", ["clearData"]),
     ...mapMutations("categorias", ["clearDataCat"]),
     upload() {
@@ -236,14 +240,17 @@ export default {
         const myFile = filePicker.files[0];
 
         //Options for file
-        const quality = 90;
-        const width = 150;
+        const quality = 100;
+        const width = "auto";
         const height = "auto";
-        const format = "webp";
+        const format = "jpeg";
 
         fromBlob(myFile, quality, width, height, format).then((blob) => {
           // will generate a url to the converted file
-          blobToURL(blob).then((url) => (this.imagePreview = url));
+          blobToURL(blob).then((url) => {
+            this.imagePreview = url;
+            this.fotoSelected(url);
+          });
         });
         //console.log(myFile);//prints the file in JSON
 
@@ -255,12 +262,14 @@ export default {
       marca.nombreMarca = "";
       marca.nombreMarca = cache;
       this.marcaDropdown = marca.nombreMarca;
+      this.marcaSelected(marca.nombreMarca);
     },
     catSel(categoria) {
       let cache = categoria.nombreCategoria;
       categoria.nombreCategoria = "";
       categoria.nombreCategoria = cache;
       this.descripcionDropdown = categoria.nombreCategoria;
+      this.categoriaSelected(categoria.nombreCategoria);
     },
   },
   computed: {
@@ -275,19 +284,20 @@ export default {
       handler() {
         if (this.newProductMobile.doc) {
           if (this.newProductMobile.doc.nombreCategoria) {
-            this.descripcionDropdown = this.newProductMobile.doc.nombreCategoria;
-          }else{
+            this.descripcionDropdown =
+              this.newProductMobile.doc.nombreCategoria;
+          } else {
             this.descripcionDropdown = "";
           }
           if (this.newProductMobile.doc.nombreMarca) {
             this.marcaDropdown = this.newProductMobile.doc.nombreMarca;
-          }else{
-            this.marcaDropdown = ""
+          } else {
+            this.marcaDropdown = "";
           }
           if (this.newProductMobile.doc.foto) {
             this.imagePreview = this.newProductMobile.doc.foto;
-          }else{
-            this.imagePreview = ""
+          } else {
+            this.imagePreview = "";
           }
         }
       },

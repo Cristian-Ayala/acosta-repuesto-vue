@@ -578,4 +578,7 @@ td input {
     align-self: center;
   }
 }
+::v-deep li.page-item.bv-d-xs-down-none{
+  display: none;
+}
 </style>
