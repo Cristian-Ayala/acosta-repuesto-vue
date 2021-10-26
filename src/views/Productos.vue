@@ -25,23 +25,36 @@
               "
               ><i class="fa fa-plus" aria-hidden="true"></i
             ></b-button>
-            <b-modal id="agregarProduc" title="BootstrapVue">
-              <p class="my-4">Hello from modal!</p>
-            </b-modal>
             <!-- end of mobile action -->
           </div>
-          <div v-if="windowWidth < 1000" style="padding: 1rem">
-            <div class="mt-3">
-              <b-pagination
-                v-model="currentPageLocal"
-                :total-rows="totalRows"
-                :per-page="perPage"
-                pills
-                align="center"
-                aria-controls="#"
+          <!-- Filtros para teléfono -->
+          <div v-if="windowWidth < 1000" class="filtros">
+            <div class="d-inline-flex pr-2 pb-2">
+              <b-button
+                v-b-modal.modalFiltros
+                pill
+                variant="info"
+                class="btn-sm pr-2 pl-2"
+                >Filtros ({{ allFilters.length }})</b-button
               >
-              </b-pagination>
             </div>
+            <div
+              class="d-inline-flex auto-scroll pb-2"
+              v-if="allFilters && allFilters.length > 0"
+            >
+              <b-button
+                pill
+                variant="outline-info"
+                class="btn-sm pr-2 pl-2"
+                disabled
+                v-for="filter in allFilters"
+                :key="filter"
+                >{{ filter }}</b-button
+              >
+            </div>
+          </div>
+          <!-- Fin de Filtros para teléfono -->
+          <div v-if="windowWidth < 1000" style="padding: 1rem">
             <b-card
               v-for="prod in productos"
               :img-src="prod.doc.foto"
@@ -83,6 +96,17 @@
                 <!-- end of mobile action -->
               </b-card-text>
             </b-card>
+            <div class="mt-3">
+              <b-pagination
+                v-model="currentPageLocal"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                pills
+                align="center"
+                aria-controls="#"
+              >
+              </b-pagination>
+            </div>
           </div>
           <div class="card-body" v-if="windowWidth >= 1000">
             <div class="form-group position-relative mb-0">
@@ -381,6 +405,7 @@
       <ConfirmarTransacciones></ConfirmarTransacciones>
       <EliminarProdMovil></EliminarProdMovil>
       <AddEditProdMovile :title="title"></AddEditProdMovile>
+      <FiltrosProductos></FiltrosProductos>
     </div>
   </div>
 </template>
@@ -389,6 +414,7 @@
 import ConfirmarTransacciones from "@/components/Productos/ConfirmarTransacciones.vue";
 import EliminarProdMovil from "@/components/Productos/EliminarProdMovil.vue";
 import AddEditProdMovile from "@/components/Productos/AddEditProdMovile.vue";
+import FiltrosProductos from "@/components/Productos/FiltrosProductos.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
@@ -397,6 +423,7 @@ export default {
     ConfirmarTransacciones,
     EliminarProdMovil,
     AddEditProdMovile,
+    FiltrosProductos,
   },
   data: () => {
     return {
@@ -423,9 +450,7 @@ export default {
       "editNewRegistro",
       "prodSelected",
     ]),
-    ...mapActions("productos", [
-      "setPage",
-    ]),
+    ...mapActions("productos", ["setPage"]),
 
     filtro(valor) {
       if (this.searchDisplay.trim() === "") return true;
@@ -453,6 +478,10 @@ export default {
       "currentPage",
       "perPage",
       "totalRows",
+      "filtroCategorias",
+      "filtroMarcas",
+      "filtroNombre",
+      "filtroUPC",
     ]),
     ...mapState("categorias", ["categorias"]),
     // funcion que evalua si hay algun dato en cache para que el boton de "Aplicar Cambios" se muestre
@@ -472,6 +501,17 @@ export default {
 
       return false;
     },
+    allFilters: function () {
+      let categories = this.filtroCategorias.map((cat) => cat.nombreCategoria);
+      let brands = this.filtroMarcas.map((marca) => marca.nombreMarca);
+      if (this.filtroNombre) {
+        categories.push(this.filtroNombre);
+      }
+      if (this.filtroUPC) {
+        categories.push(this.filtroUPC);
+      }
+      return categories.concat(brands);
+    },
   },
   /*
     hook para inicializar los valores de la tabla
@@ -488,7 +528,7 @@ export default {
     currentPageLocal: function (valor) {
       this.setPage(valor);
     },
-  }
+  },
 };
 </script>
 <style scoped>
@@ -578,7 +618,20 @@ td input {
     align-self: center;
   }
 }
-::v-deep li.page-item.bv-d-xs-down-none{
+::v-deep li.page-item.bv-d-xs-down-none {
   display: none;
+}
+.filtros {
+  box-shadow: 1px 0.5rem 0.8rem rgb(0 0 0 / 10%);
+  padding: 0.5rem;
+  display: flex;
+}
+::v-deep .card-header {
+  box-shadow: none;
+}
+::v-deep .auto-scroll {
+  overflow: scroll;
+  user-select: none;
+  padding-bottom: 0.5 rem;
 }
 </style>

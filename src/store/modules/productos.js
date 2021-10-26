@@ -38,7 +38,11 @@ export default {
             firstDoc: null,
             lastDoc: null,
             skip: 0,
-        }
+        },
+        filtroCategorias: [],
+        filtroMarcas: [],
+        filtroNombre: "",
+        filtroUPC: "",
     },
     mutations: {
         prodSelected(state, productoSelected) {
@@ -390,7 +394,7 @@ export default {
         }, producto) {
             console.log(producto);
             producto.doc._deleted = true;
-            producto.doc.activoProd=false;
+            producto.doc.activoProd = false;
             state.localProductos.put(producto.doc).then(() => {
                 dispatch('readProducto').then(() => commit("successNotification", {
                     "message": "Producto eliminado con éxito",
@@ -600,12 +604,27 @@ export default {
                 dispatch("createProducto", [producto])
             }
         },
-        // createIndexs({
-        //     state,
-        //     dispatch
-        // }){
-
-        // }
+        aplicarFiltros({
+            state,
+            dispatch
+        }, prod) {
+            state.filtroCategorias = prod.cat;
+            state.filtroMarcas = prod.mar;
+            state.filtroUPC = prod.upc;
+            state.filtroNombre = prod.nom;
+            dispatch("readProducto");
+        },
+        borrarFiltros({
+            state,
+            dispatch
+        }) {
+            console.log("Filtros borrados");
+            state.filtroCategorias = [];
+            state.filtroMarcas = [];
+            state.filtroUPC = "";
+            state.filtroNombre = "";
+            dispatch("readProducto");
+        }
     }
 }
 
