@@ -28,16 +28,19 @@ export default {
         localProductos: null,
         currentPage: 1,
         perPage: 5,
-        totalRows: 100,
+        totalRows: 0,
         optionsPagination: {
-            include_docs: true,
             descending: false,
-            limit: 5
+            limit: 5,
+            startkey: null,
+            skip: 0,
+            selectorFilter: {
+                $gt: null
+            },
         },
         paginationHelper: {
             firstDoc: null,
             lastDoc: null,
-            skip: 0,
         },
         filtroCategorias: [],
         filtroMarcas: [],
@@ -341,22 +344,23 @@ export default {
             }
         },
         readProducto({
-            state
+            state,
+            dispatch
         }) {
-            state.localProductos.allDocs(state.optionsPagination).then(response => {
-                state.totalRows = response.total_rows;
-                if (response.rows.length > 0) {
-                    //condicional verificando si estan al reves y darles la vuelta
-                    if (state.optionsPagination.descending) {
-                        response.rows = response.rows.reverse();
-                    }
-                    state.paginationHelper.firstDoc = response.rows[0].id;
-                    state.paginationHelper.lastDoc = response.rows[response.rows.length - 1].id;
-                    // console.log(response);
-                    state.productos = response.rows;
-
-                }
-            }).catch(console.log);
+            // filtroNombre: "",
+            if (state.filtroUPC.trim() !== "") {
+                dispatch("readProductsUPC");
+                return;
+            }
+            if (state.filtroNombre.trim() !== "") {
+                dispatch("readProductoNombre");
+                return;
+            }
+            if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) {
+                dispatch('readProductoMarcaCategorias');
+                return;
+            }
+            dispatch('readAllProducts');
         },
         updateProducto({
             state,
@@ -496,6 +500,7 @@ export default {
             state.localProductos.replicate.from(remoteProductos).on('complete', () => {
                 // console.log("Se terminó la replicación");
                 dispatch("readProducto");
+                //dispatch("createIndexes");
                 // then two-way, continuous, retriable sync
                 state.localProductos.sync(remoteProductos, {
                         live: true,
@@ -517,42 +522,209 @@ export default {
                     });
             })
         },
+        createIndexes({
+            state
+        }) {
+            state.localProductos.createIndex({
+                index: {
+                    fields: ['nombreMarca', 'nombreCategoria'],
+                    ddoc: "marcas_categorias"
+                }
+            }).then(() => {
+                console.log("Index creado");
+            }).catch((err) => {
+                console.log(err);
+            });
+            state.localProductos.createIndex({
+                index: {
+                    fields: ['nombreMarca'],
+                    ddoc: "marcas"
+                }
+            }).then(() => {
+                console.log("Index marcas creado");
+            }).catch((err) => {
+                console.log(err);
+            });
+            state.localProductos.createIndex({
+                index: {
+                    fields: ['nombreCategoria'],
+                    ddoc: "categorias"
+                }
+            }).then(() => {
+                console.log("Index categorias creado");
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        readAllProducts({
+            state
+        }) {
+            if (state.currentPage === 1) {
+                state.localProductos.query('totalProd/totalProd').then((response) => {
+                    state.totalRows = response.rows[0].value;
+                }).catch(console.log);
+            }
+            let totalLimit = state.optionsPagination.skip + state.optionsPagination.limit;
+            state.localProductos.find({
+                "selector": {
+                    "_id": {
+                        ...state.optionsPagination.selectorFilter
+                    }
+                },
+                "limit": totalLimit,
+                "sort": [{
+                    "_id": state.optionsPagination.descending ? "desc" : "asc"
+                }],
+            }).then((response) => {
+                if (state.optionsPagination.descending) {
+                    response.docs = response.docs.reverse();
+                }
+                state.paginationHelper.firstDoc = response.docs[0]._id;
+                state.paginationHelper.lastDoc = response.docs[response.docs.length - 1]._id;
+                state.productos = response.docs.map(el => ({
+                    doc: el
+                })); //para darle formato a la respuesta
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        readProductsUPC({
+            state
+        }) {
+            console.log("Filtro de UPC");
+            state.localProductos.find({
+                selector: {
+                    upc: state.filtroUPC
+                }
+            }).then(response => {
+                state.totalRows = response.docs.length;
+                if (response.docs.length > 0) {
+                    state.productos = response.docs.map(el => ({
+                        doc: el
+                    })); //para darle formato a la respuesta
+                } else {
+                    state.productos = [];
+                }
+            }).catch(console.log);
+        },
+        readProductoNombre({
+            state
+        }) {
+            console.log("Filtro de Nombre");
+            state.localProductos.find({
+                selector: {
+                    nombreProd: {
+                        "$regex": RegExp(state.filtroNombre, "i"),
+                    }
+                }
+            }).then(response => {
+                state.totalRows = response.docs.length;
+                if (response.docs.length > 0) {
+                    state.productos = response.docs.map(el => ({
+                        doc: el
+                    })); //para darle formato a la respuesta
+                } else {
+                    state.productos = [];
+                }
+            }).catch(console.log);
+        },
+        readProductoMarcaCategorias({
+            state
+        }) {
+            let selector = {};
+            selector._id = {
+                ...state.optionsPagination.selectorFilter
+            };
+            if (state.filtroMarcas.length > 0) {
+                selector.nombreMarca = {
+                    $in: state.filtroMarcas.map(marca => marca.nombreMarca)
+                };
+            }
+            if (state.filtroCategorias.length > 0) {
+                selector.nombreCategoria = {
+                    $in: state.filtroCategorias.map(categoria => categoria.nombreCategoria)
+                };
+            }
+            //Put code below on an if, it will be called just once
+            //This is just to find out how many documents are in total
+            //Pagination purposes
+            if (state.currentPage === 1) {
+                state.localProductos.find({
+                    selector: selector,
+                }).then((response) => {
+                    state.totalRows = response.docs.length;
+                    console.log(state.totalRows);
+                }).catch(console.log);
+            }
+            //This is the actual query
+            state.localProductos.find({
+                "selector": selector,
+                "limit": state.optionsPagination.limit,
+                "sort": [{
+                    "_id": state.optionsPagination.descending ? "desc" : "asc"
+                }],
+            }).then(function (response) {
+                if (response.docs.length > 0) {
+                    //condicional verificando si estan al reves y darles la vuelta
+                    if (state.optionsPagination.descending) {
+                        response.docs = response.docs.reverse();
+                    }
+                    state.paginationHelper.firstDoc = response.docs[0]._id;
+                    state.paginationHelper.lastDoc = response.docs[response.docs.length - 1]._id;
+                    state.productos = response.docs.map(el => ({
+                        doc: el
+                    })); //para darle formato a la respuesta
+                } else {
+                    state.productos = [];
+                }
+            }).catch(console.log);
+        },
         // ----------------------- Start of pagination -----------------------
         lastPage({
             state,
             dispatch
         }) {
+            // startkey
+            state.optionsPagination.selectorFilter = {
+                $gt: null
+            };
             state.optionsPagination.skip = 0;
             state.optionsPagination.descending = true;
-            state.optionsPagination.startkey = null;
             state.currentPage = Math.ceil(state.totalRows / state.perPage);
             //numer of pages full of products
             var pagesFullofProducts = Math.trunc(state.totalRows / state.perPage);
             //calculate new limit
             var newLimit = state.totalRows - (state.perPage * pagesFullofProducts);
-            state.optionsPagination.limit = newLimit;
+            state.optionsPagination.limit = newLimit; //New limit must be calculates because the last page is not full of products, so it will be less than the perPage
             dispatch("readProducto");
         },
         firstPage({
             state,
             dispatch
         }) {
+            // startkey
+            state.optionsPagination.selectorFilter = {
+                $gt: null
+            };
+            state.optionsPagination.limit = state.perPage;
             state.optionsPagination.skip = 0;
             state.currentPage = 1;
             state.optionsPagination.descending = false;
-            state.optionsPagination.startkey = null;
             dispatch("readProducto");
         },
         nextPage({
             state,
             dispatch
         }, page) {
+            // startkey
+            state.optionsPagination.selectorFilter = {
+                $gt: state.paginationHelper.lastDoc
+            };
             state.currentPage = page;
             var lastPage = Math.ceil(state.totalRows / state.perPage);
             if (state.currentPage < lastPage) {
                 state.optionsPagination.skip = 1;
                 state.optionsPagination.descending = false;
-                state.optionsPagination.startkey = state.paginationHelper.lastDoc;
                 dispatch("readProducto");
             } else if (lastPage === state.currentPage) {
                 dispatch("lastPage");
@@ -562,11 +734,14 @@ export default {
             state,
             dispatch
         }, page) {
+            // startkey
+            state.optionsPagination.selectorFilter = {
+                $lt: state.paginationHelper.firstDoc
+            };
             state.currentPage = page;
             if (state.currentPage > 1) {
                 state.optionsPagination.descending = true;
                 state.optionsPagination.skip = 1;
-                state.optionsPagination.startkey = state.paginationHelper.firstDoc;
                 dispatch("readProducto");
             } else if (state.currentPage === 1) {
                 dispatch("firstPage");
@@ -576,6 +751,9 @@ export default {
             state,
             dispatch
         }, page) {
+            if (page === state.currentPage) {
+                return;
+            }
             state.optionsPagination.limit = state.perPage;
             if (page === 1) {
                 dispatch("firstPage");
@@ -612,18 +790,17 @@ export default {
             state.filtroMarcas = prod.mar;
             state.filtroUPC = prod.upc;
             state.filtroNombre = prod.nom;
-            dispatch("readProducto");
+            dispatch("firstPage");
         },
         borrarFiltros({
             state,
             dispatch
         }) {
-            console.log("Filtros borrados");
             state.filtroCategorias = [];
             state.filtroMarcas = [];
             state.filtroUPC = "";
             state.filtroNombre = "";
-            dispatch("readProducto");
+            dispatch("firstPage");
         }
     }
 }

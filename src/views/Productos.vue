@@ -528,6 +528,9 @@ export default {
     currentPageLocal: function (valor) {
       this.setPage(valor);
     },
+    currentPage: function (valor) {
+      this.currentPageLocal = valor;
+    },
   },
 };
 </script>
