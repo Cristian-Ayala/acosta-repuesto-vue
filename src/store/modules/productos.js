@@ -352,12 +352,8 @@ export default {
                 dispatch("readProductsUPC");
                 return;
             }
-            if (state.filtroNombre.trim() !== "") {
-                dispatch("readProductoNombre");
-                return;
-            }
-            if (state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) {
-                dispatch('readProductoMarcaCategorias');
+            if (state.filtroNombre.trim() !== "" || state.filtroCategorias.length > 0 || state.filtroMarcas.length > 0) {
+                dispatch('readProductoCategoriaMarcaNombre');
                 return;
             }
             dispatch('readAllProducts');
@@ -607,34 +603,18 @@ export default {
                 }
             }).catch(console.log);
         },
-        readProductoNombre({
-            state
-        }) {
-            console.log("Filtro de Nombre");
-            state.localProductos.find({
-                selector: {
-                    nombreProd: {
-                        "$regex": RegExp(state.filtroNombre, "i"),
-                    }
-                }
-            }).then(response => {
-                state.totalRows = response.docs.length;
-                if (response.docs.length > 0) {
-                    state.productos = response.docs.map(el => ({
-                        doc: el
-                    })); //para darle formato a la respuesta
-                } else {
-                    state.productos = [];
-                }
-            }).catch(console.log);
-        },
-        readProductoMarcaCategorias({
+        readProductoCategoriaMarcaNombre({
             state
         }) {
             let selector = {};
             selector._id = {
                 ...state.optionsPagination.selectorFilter
             };
+            if (state.filtroNombre) {
+                selector.nombreProd = {
+                    "$regex": RegExp(state.filtroNombre, "i"),
+                }
+            }
             if (state.filtroMarcas.length > 0) {
                 selector.nombreMarca = {
                     $in: state.filtroMarcas.map(marca => marca.nombreMarca)
@@ -776,7 +756,7 @@ export default {
         }, producto) {
             console.log("Confirmation: ", producto);
             //Verify in confirmation is for update o create new
-            if (producto.id) {
+            if (producto.doc._rev) {
                 dispatch("updateProducto", [producto])
             } else {
                 dispatch("createProducto", [producto])
