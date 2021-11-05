@@ -1,12 +1,22 @@
 <template>
   <div>
-    <b-modal id="modalFiltros" scrollable centered size="xl" title="" @show="getFilters">
+    <b-modal
+      id="modalFiltros"
+      scrollable
+      centered
+      size="xl"
+      title=""
+      @show="getFilters"
+    >
       <h5>UPC</h5>
       <div class="input-group">
         <input type="text" class="form-control" v-model="tmpFiltroUPC" /><span
           class="input-group-text"
           v-b-modal.barCode
-          @click="showBarcode = !showBarcode"
+          @click="
+            showBarcode = !showBarcode;
+            setCalledFrom('FiltrosProductos.vue');
+          "
           ><i class="fas fa-barcode"
         /></span>
       </div>
@@ -95,7 +105,7 @@
 </template>
 <script>
 // import { mapState, mapMutations, mapActions } from "vuex";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
   name: "FiltrosProductos",
@@ -117,11 +127,13 @@ export default {
       "filtroMarcas",
       "filtroNombre",
       "filtroUPC",
+      "tempFiltroUPC"
     ]),
   },
   methods: {
     ...mapActions("productos", ["aplicarFiltros", "borrarFiltros"]),
-    getFilters(){
+    ...mapMutations("productos", ["setCalledFrom","setFiltroUPC"]),
+    getFilters() {
       // console.log(JSON.parse(JSON.stringify(this.filtroMarcas)));
       // console.log(this.filtroMarcas);
       // console.log(JSON.parse(JSON.stringify(this.filtroMarcas)) == this.filtroMarcas);
@@ -131,7 +143,6 @@ export default {
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
       this.tmpFiltroNombre = this.filtroNombre.toString();
       this.tmpFiltroUPC = this.filtroUPC.toString();
-
     },
   },
   watch: {
@@ -145,7 +156,11 @@ export default {
       this.tmpFiltroNombre = filtroNombre.toString();
     },
     filtroUPC: function (filtroUPC) {
-      this.tmpFiltroUPC = filtroUPC.toString();
+      // this.setFiltroUPC(filtroUPC.toString());
+      this.tmpFiltroUPC = filtroUPC;
+    },
+    tempFiltroUPC: function (tempFiltroUPC) {
+      this.tmpFiltroUPC = tempFiltroUPC;
     },
   },
 };

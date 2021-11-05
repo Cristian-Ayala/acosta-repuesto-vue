@@ -7,7 +7,7 @@
         v-if="!barcode"
       ></StreamBarcodeReader>
       <span v-if="barcode"
-        >¿Es este el UPC: <b>{{ newProductMobile.doc.upc }}</b
+        >¿Es este el UPC: <b>{{ barcode }}</b
         >?</span
       >
       <template #modal-footer="{ ok, hide }">
@@ -31,7 +31,7 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import { StreamBarcodeReader } from "vue-barcode-reader";
 export default {
   name: "UPCReader",
@@ -45,8 +45,15 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("productos", ["setFiltroUPC"]),
     onDecode(a) {
-      this.newProductMobile.doc.upc = a;
+      console.log(this.calledFrom);
+      if (this.calledFrom === "FiltrosProductos.vue") {
+        this.setFiltroUPC(a);
+      }
+      if (this.calledFrom === "AddEditProdMovile.vue") {
+        this.newProductMobile.doc.upc = a;
+      }
       this.barcode = a;
     },
     onLoaded() {
@@ -54,7 +61,12 @@ export default {
     },
   },
   computed: {
-    ...mapState("productos", ["newProductMobile"]),
+    ...mapState("productos", ["newProductMobile", "calledFrom"]),
+  },
+  watch: {
+    calledFrom() {
+      this.barcode = "";
+    },
   },
 };
 </script>

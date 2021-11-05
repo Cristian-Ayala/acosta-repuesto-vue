@@ -14,7 +14,7 @@
             /><span
               class="input-group-text"
               v-b-modal.barCode
-              @click="showBarcode = !showBarcode"
+              @click="showBarcode = !showBarcode;setCalledFrom('AddEditProdMovile.vue')"
               ><i class="fas fa-barcode"
             /></span>
           </div>
@@ -225,6 +225,7 @@ export default {
       "marcaSelected",
       "categoriaSelected",
       "fotoSelected",
+      "setCalledFrom"
     ]),
     ...mapActions("productos", ["confirmation"]),
     ...mapMutations("marcas", ["clearData"]),

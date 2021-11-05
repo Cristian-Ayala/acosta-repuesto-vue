@@ -46,6 +46,8 @@ export default {
         filtroMarcas: [],
         filtroNombre: "",
         filtroUPC: "",
+        tempFiltroUPC: "",
+        calledFrom: "",
     },
     mutations: {
         prodSelected(state, productoSelected) {
@@ -310,7 +312,12 @@ export default {
         fotoSelected(state, foto) {
             state.newProductMobile.doc.foto = foto;
         },
-
+        setFiltroUPC(state, upc) {
+            state.tempFiltroUPC = upc;
+        },
+        setCalledFrom(state, calledFrom) {
+            state.calledFrom = calledFrom;
+        },
     },
     actions: {
         createProducto({
