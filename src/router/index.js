@@ -28,6 +28,11 @@ const routes = [{
         path: '/ordenes',
         name: 'Ordenes',
         component: () => import('../views/Ordenes.vue')
+      },
+      {
+        path: '/actualizar',
+        name: 'Actualizar',
+        component: () => import('../views/Actualizar.vue')
       }
     ]
   },

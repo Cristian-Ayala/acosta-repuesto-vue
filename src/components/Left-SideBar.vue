@@ -77,6 +77,19 @@
           ><span>Ordenes</span>
         </a>
       </router-link>
+      <router-link
+        tag="a"
+        to="/actualizar"
+        class="sidebar-link text-muted sidebar-list-item"
+        v-slot="{ href, navigate }"
+        custom
+        :class="this.$route.path === '/actualizar' ? 'active' : ''"
+      >
+        <a :href="href" @click="navigate">
+          <i class="fa fa-upload mr-3 text-gray my-2" aria-hidden="true"></i>
+          <span>Actualizar</span>
+        </a>
+      </router-link>
     </ul>
   </div>
 </template>
