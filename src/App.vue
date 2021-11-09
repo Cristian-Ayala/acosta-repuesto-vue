@@ -40,12 +40,14 @@ export default {
     ...mapActions("marcas", ["initDB"]),
     ...mapActions("categorias", ["initDbCategorias"]),
     ...mapActions("productos", ["initDbProductos"]),
+    ...mapActions("usuarios", ["initDBUsuarios"]),
   },
   created() {
     console.log("App.vue se instanció");
     this.initDB();
     this.initDbCategorias();
     this.initDbProductos();
+    this.initDBUsuarios();
   },
 };
 </script>

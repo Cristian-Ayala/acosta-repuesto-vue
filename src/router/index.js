@@ -33,6 +33,11 @@ const routes = [{
         path: '/actualizar',
         name: 'Actualizar',
         component: () => import('../views/Actualizar.vue')
+      },
+      {
+        path: '/usuarios',
+        name: 'Usuarios',
+        component: () => import('../views/Usuarios.vue')
       }
     ]
   },

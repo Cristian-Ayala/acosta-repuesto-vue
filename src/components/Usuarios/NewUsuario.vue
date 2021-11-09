@@ -1,29 +1,26 @@
 <template>
   <div>
-    <b-modal id="modal-edit" centered title="Editar categoria">
+    <b-modal id="modalNewUsuario" centered title="Agregar usuario">
       <div class="card-body">
         <div class="form-group row">
-          <label class="col-md-3 form-control-label">Nombre</label>
+          <label class="col-md-3 form-control-label">Usuario</label>
           <div class="col-md-9">
             <input
-            v-if="catSelected.doc"
               type="text"
               class="form-control"
-              v-model="catSelected.doc.nombreCategoria"
+              v-model="usuario.nickname"
             />
           </div>
         </div>
         <div class="line"></div>
         <div class="form-group row">
-          <label class="col-md-3 form-control-label">Descripción</label>
+          <label class="col-md-3 form-control-label">Contraseña</label>
           <div class="col-md-9">
-            <textarea
-            v-if="catSelected.doc"
+            <input
+              type="text"
               class="form-control"
-              id="exampleFormControlTextarea1"
-              rows="3"
-              v-model="catSelected.doc.descripcion"
-            ></textarea>
+              v-model="usuario.password"
+            />
           </div>
         </div>
       </div>
@@ -32,7 +29,16 @@
         <b-button size="m" variant="secondary" @click="cancel()">
           Cancelar
         </b-button>
-        <b-button size="m" variant="primary" @click="edithRegistro(); ok()"> Guardar </b-button>
+        <b-button
+          size="m"
+          variant="primary"
+          @click="
+            ok();
+            createRegistro();
+          "
+        >
+          Guardar
+        </b-button>
       </template>
     </b-modal>
   </div>
@@ -42,18 +48,15 @@
 import { mapState, mapActions } from "vuex";
 
 export default {
-  name: "EditCat",
+  name: "newUser",
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
-    ...mapActions("categorias",["edithRegistro"]),
+    ...mapActions("usuarios", ["createRegistro"]),
   },
   computed: {
-    ...mapState("categorias",["catSelected"]),
-  },
-  mounted() {
+    ...mapState("usuarios", ["usuario"]),
   },
 };
 </script>

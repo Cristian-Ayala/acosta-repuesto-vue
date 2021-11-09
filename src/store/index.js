@@ -4,6 +4,7 @@ import categorias from "./modules/categorias.js";
 import productos from "./modules/productos.js";
 import marcas from "./modules/marcas.js";
 import ordenes from "./modules/ordenes.js";
+import usuarios from "./modules/usuarios.js";
 Vue.use(Vuex)
 
 
@@ -17,5 +18,6 @@ export default new Vuex.Store({
     productos,
     marcas,
     ordenes,
+    usuarios
   }
 })

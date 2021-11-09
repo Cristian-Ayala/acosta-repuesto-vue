@@ -9,7 +9,7 @@
           <div class="card-body">
             <i class="fas fa-sync text-red fa-10x" aria-hidden="true"></i>
             <button class="bubbly-button" @click="animateButton">
-              Click me!
+              Click para actualizar
             </button>
           </div>
         </div>

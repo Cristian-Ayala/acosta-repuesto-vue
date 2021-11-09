@@ -90,6 +90,19 @@
           <span>Actualizar</span>
         </a>
       </router-link>
+      <router-link
+        tag="a"
+        to="/usuarios"
+        class="sidebar-link text-muted sidebar-list-item"
+        v-slot="{ href, navigate }"
+        custom
+        :class="this.$route.path === '/usuarios' ? 'active' : ''"
+      >
+        <a :href="href" @click="navigate">
+          <i class="fa fa-user mr-3 text-gray my-2" aria-hidden="true"></i>
+          <span>Usuarios</span>
+        </a>
+      </router-link>
     </ul>
   </div>
 </template>
