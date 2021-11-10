@@ -33,8 +33,14 @@
   </div>
 </template>
 <script>
-import axios from "axios";
-
+var PouchDB = require("pouchdb").default;
+PouchDB.plugin(require("pouchdb-authentication").default);
+var remoteUsuarios;
+const remotedb = async (url) => {
+  remoteUsuarios = await new PouchDB(url + "marcas", {
+    skip_setup: true,
+  });
+};
 export default {
   name: "Login",
   components: {},
@@ -43,7 +49,6 @@ export default {
       username: "",
       password: "",
       error: false,
-      axios: null,
     };
   },
   mounted() {
@@ -56,19 +61,18 @@ export default {
   },
   methods: {
     login() {
-      this.axios({
-        method: "post",
-        url: `${this.$url}_session/`,
-        data: { name: this.username, password: this.password },
-      })
+      var that = this;
+      remoteUsuarios
+        .logIn(this.username, this.password)
         .then((res) => {
-          if (res.status === 200) {
-            this.$router.push({ path: "/" });
+          console.log(JSON.stringify(res));
+          if (res.ok) {
+            that.$router.push({ path: "/" });
           }
         })
-        .catch((error) => {
-          this.error = true;
-          console.log(error);
+        .catch(function (err) {
+          console.log(JSON.stringify(err));
+          that.error = true;
         });
     },
     areCookiesEnabled() {
@@ -99,9 +103,13 @@ export default {
       cookieSuccess ? "" : that.$router.push({ path: "/cookies" });
     };
     // Fin de script para probar si las cookies de terceros estan habilitadas
-    this.axios = axios.create({
-      withCredentials: true,
-    });
+    remotedb(this.$url)
+      .then((res) => {
+        console.log(JSON.stringify(res));
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err));
+      });
   },
 };
 </script>

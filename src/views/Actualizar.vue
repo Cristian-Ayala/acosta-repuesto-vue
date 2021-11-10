@@ -4,12 +4,15 @@
       <div style="margin-top: 2rem">
         <div class="card">
           <div class="card-header">
-            <h1 class="pt-2">Actualizar</h1>
+            <h6 class="text-uppercase mb-0" style="display: inline-block">Actualizar</h6>
           </div>
           <div class="card-body">
-            <i class="fas fa-sync text-red fa-10x" aria-hidden="true"></i>
-            <button class="bubbly-button" @click="animateButton">
-              Click para actualizar
+            <i class="fas fa-sync fa-10x animationColor" aria-hidden="true"></i>
+            <button
+              class="bubbly-button gradient-btn-outlined button-four"
+              @click="animateButton"
+            >
+              <span> Click para actualizar </span>
             </button>
           </div>
         </div>
@@ -58,110 +61,94 @@ export default {
   display: flex;
   justify-content: center;
 }
+/* cambiar color a icono */
+.animationColor {
+  animation: Color 4s ease-in-out infinite;
+  text-shadow: 10px 10px #f0f0f0;
+}
+@keyframes Color {
+  0% {
+    color: #b21322;
+  }
+
+  20% {
+    color: #ba1f28;
+  }
+
+  40% {
+    color: #c3292e;
+  }
+
+  60% {
+    color: #cb3234;
+  }
+
+  80% {
+    color: #c3292e;
+  }
+
+  100% {
+    color: #b21322;
+  }
+}
+/* fin de cambiar color a icono */
 
 /* Boton de actualizar  */
+.button-four {
+  background: linear-gradient(-45deg, #833ab4, #fd1d1d, #fcb045);
+}
 .bubbly-button {
-  font-family: "Helvetica", "Arial", sans-serif;
-  display: block;
-  font-size: 1em;
-  padding: 1em 2em;
+  box-shadow: 0 4px 12px 0 rgba(152, 160, 180, 10);
   margin-top: 100px;
   margin-bottom: 60px;
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: #000000;
-  color: #fff;
-  border-radius: 4px;
-  border: none;
+  font-family: "Poppins";
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
   cursor: pointer;
-  position: relative;
-  transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
-  box-shadow: 0 2px 25px rgba(0, 47, 255, 0.5);
+  border-radius: 6px;
+  background-size: 400% 400%;
+  color: #212529;
+  text-transform: uppercase;
+  border: 0;
+  padding: 13px 30px;
+  font-size: 15px;
+  animation: Gradient 10s ease infinite;
 }
-.bubbly-button:focus {
-  outline: 0;
-}
-.bubbly-button:before,
-.bubbly-button:after {
-  position: absolute;
-  content: "";
-  display: block;
-  width: 140%;
-  height: 100%;
-  left: -20%;
-  z-index: -1000;
-  transition: all ease-in-out 0.5s;
-  background-repeat: no-repeat;
-}
-.bubbly-button:before {
-  display: none;
-  top: -75%;
-  background-image: radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, transparent 20%, #000000 20%, transparent 30%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, transparent 10%, #000000 15%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%);
-  background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%,
-    10% 10%, 18% 18%;
-}
-.bubbly-button:after {
-  display: none;
-  bottom: -75%;
-  background-image: radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, transparent 10%, #000000 15%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%),
-    radial-gradient(circle, #000000 20%, transparent 20%);
-  background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
-}
-.bubbly-button:active {
-  transform: scale(0.9);
-  background-color: #090a50;
-  box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
-}
-.bubbly-button.animate:before {
-  display: block;
-  animation: topBubbles ease-in-out 0.75s forwards;
-}
-.bubbly-button.animate:after {
-  display: block;
-  animation: bottomBubbles ease-in-out 0.75s forwards;
+.bubbly-button:hover {
+  background-size: 150% 150%;
 }
 
-@keyframes topBubbles {
-  0% {
-    background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%,
-      40% 90%, 55% 90%, 70% 90%;
-  }
-  50% {
-    background-position: 0% 80%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%,
-      50% 50%, 65% 20%, 90% 30%;
-  }
-  100% {
-    background-position: 0% 70%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%,
-      50% 40%, 65% 10%, 90% 20%;
-    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
-  }
+.gradient-btn-outlined {
+  animation: Gradient 10s ease infinite;
+  position: relative;
 }
-@keyframes bottomBubbles {
+.gradient-btn-outlined span {
+  position: relative;
+  z-index: 2;
+}
+.gradient-btn-outlined::after {
+  content: "";
+  position: absolute;
+  border-radius: 4px;
+  z-index: 0;
+  background: rgb(255, 255, 255);
+  top: 2px;
+  bottom: 2px;
+  right: 2px;
+  left: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+}
+@keyframes Gradient {
   0% {
-    background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%,
-      70% -10%, 70% 0%;
+    background-position: 0% 50%;
   }
   50% {
-    background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%,
-      105% 0%;
+    background-position: 100% 50%;
   }
   100% {
-    background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%,
-      110% 10%;
-    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+    background-position: 0% 50%;
   }
 }
 </style>

@@ -97,6 +97,7 @@
         v-slot="{ href, navigate }"
         custom
         :class="this.$route.path === '/usuarios' ? 'active' : ''"
+        v-if="actualUser.rol && actualUser.rol.length"
       >
         <a :href="href" @click="navigate">
           <i class="fa fa-user mr-3 text-gray my-2" aria-hidden="true"></i>
@@ -104,18 +105,27 @@
         </a>
       </router-link>
     </ul>
+    <a
+      href="#"
+      @click="logout()"
+      class="sidebar-link text-muted sidebar-list-item position-bottom"
+    >
+      <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
+      <span v-if="actualUser">Salir {{actualUser.user}}</span>
+    </a>
   </div>
 </template>
 
 <script>
+import { mapState,mapActions } from "vuex";
+
 export default {
-  mounted() {},
-  // computed: {
-  //   actClass(path) {
-  //     console.log(this.$router.currentRoute.path);
-  //     return this.$router.currentRoute.path;
-  //   },
-  // },
+  methods: {
+    ...mapActions("usuarios", ["logout"]),
+  },
+  computed: {
+    ...mapState("usuarios", ["actualUser"]),
+  },
 };
 </script>
 <style scoped>
@@ -129,5 +139,11 @@ export default {
 .side-in-leave-to {
   margin-left: -5rem;
   opacity: 0;
+}
+.position-bottom {
+  position: fixed;
+  bottom: 0;
+  margin-bottom: 1rem;
+  width: inherit;
 }
 </style> 

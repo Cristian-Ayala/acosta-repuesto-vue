@@ -20,7 +20,8 @@ export default {
         "PouchDB": PouchDB,
         "usuario": {},
         "usuarios": [],
-        "showModalEdit": false
+        "showModalEdit": false,
+        "actualUser": {},
     },
     mutations: {
         clearData(state) {
@@ -90,34 +91,17 @@ export default {
         }) {
             axios1({
                     method: "GET",
-                    url: `https://www.couchdb.me/_users/_all_docs/`,
+                    url: this._vm.$url+"_users/_all_docs",
                 })
                 .then((res) => {
                     if (res.status === 200) {
-                        state.usuarios = res.data.rows.filter(usr => usr.id.includes('org'));
+                        let rows = res.data.rows || [];
+                        state.usuarios = rows.filter(usr => usr.id.includes('org'));
                     }
                 })
                 .catch((error) => {
-                    console.log(JSON.stringify(error));
+                    console.error(JSON.stringify(error));
                 });
-            // remoteUsuarios.logIn('useradmin', 'password').then((response) => {
-            //     console.log(JSON.stringify(response));
-            // }).catch(function (err) {
-            //     console.log(JSON.stringify(err));
-            //     if (err.name === 'unauthorized' || err.name === 'forbidden') {
-            //         // name or password incorrect
-            //         commit("alertNotification", {
-            //             "message": "Nombre o contra erroneos.<br>" + err,
-            //             "duration": 4000
-            //         })
-            //     } else {
-            //         // cosmic rays, a meteor, etc.
-            //         commit("alertNotification", {
-            //             "message": "Saber que p2.<br>" + err,
-            //             "duration": 4000
-            //         })
-            //     }
-            // });
         },
         editRegistro({
             state,
@@ -199,46 +183,46 @@ export default {
                 });
             });
         },
-        initDBUsuarios({
+        initDBUsuarios({state,
             dispatch
         }) {
+            //Se agrega el nombre de la DB ("marca") en la función del inicio por eso no se pasa acá
             remotedb(this._vm.$url).then(() => {
-                remoteUsuarios.info().then(() => {
-                    dispatch("getAll");
-                }).catch(err => {
-                    if (err.status === 401) {
-                        console.log("no autorizado");
-                        router.push({
-                            path: "/login"
-                        }).catch(() => {});
+                remoteUsuarios.getSession().then(response => {
+                    if (response.userCtx.name) {
+                        state.actualUser.user = response.userCtx.name;
+                        state.actualUser.roles = response.userCtx.roles;
+                        if (state.actualUser.roles && state.actualUser.roles.length) {
+                            dispatch("getAll");
+                        }
+                    } else {
+                        throw new Error(JSON.stringify("No hay usuario"));
                     }
+                }).catch(() => {
+                    router.push({
+                        path: "/login"
+                    }).catch(() => {});
                 });
+                //el getAll debería ir luego de verificar si es admin
+                // remoteUsuarios.info().then((res) => {
+                //     console.log(JSON.stringify(res));
+                //     dispatch("getAll");
+                // }).catch(err => {
+                //     if (err.status === 401) {
+                //         console.log("no autorizado");
+                //         router.push({
+                //             path: "/login"
+                //         }).catch(() => {});
+                //     }
+                // });
             }).catch(console.log);
-            // state.localUsuarios = new state.PouchDB("usuarios");
-            // // do one way, one-off sync from the server until completion
-            // state.localUsuarios.replicate.from(remoteUsuarios).on('complete', () => {
-            //     // console.log("Se terminó la replicación");
-            //     dispatch("getAll");
-            //     // then two-way, continuous, retriable sync
-            //     state.localUsuarios.sync(remoteUsuarios, {
-            //             live: true,
-            //             retry: true
-            //         }).on('change', function (change) {
-            //             console.log("yo, something changed!", change);
-            //             dispatch("getAll");
-            //         }).on('paused', function (info) {
-            //             console.log("replication was paused, usually because of a lost connection", info);
-            //         }).on('active', function (info) {
-            //             console.log("replication was resumed", info);
-            //         }).on('denied', function (err) {
-            //             console.log("a document failed to replicate (e.g. due to permissions)", err);
-            //         })
-            //         .on('complete', function (info) {
-            //             console.log("Completado", info);
-            //         }).on('error', function (err) {
-            //             console.log("totally unhandled error (shouldn't happen)", err);
-            //         });
-            // }).on('error', console.log.bind(console));
+        },
+        logout() {
+            remoteUsuarios.logout().then(() => {
+                router.push({
+                    path: "/login"
+                }).catch(console.log);
+            }).catch(console.log);
         }
     }
 }
