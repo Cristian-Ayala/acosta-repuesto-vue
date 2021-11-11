@@ -31,14 +31,8 @@ export default {
   },
   computed: {},
   methods: {
-    animateButton(e) {
-      //reset animation
-      e.target.classList.remove("animate");
-      e.target.classList.add("animate");
-      setTimeout(function () {
-        e.target.classList.remove("animate");
-        window.location.reload(true);
-      }, 500);
+    animateButton() {
+      window.location.reload(true);
     },
   },
 };

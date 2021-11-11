@@ -96,8 +96,8 @@
         class="sidebar-link text-muted sidebar-list-item"
         v-slot="{ href, navigate }"
         custom
+        v-if="actualUser.roles && actualUser.roles.length"
         :class="this.$route.path === '/usuarios' ? 'active' : ''"
-        v-if="actualUser.rol && actualUser.rol.length"
       >
         <a :href="href" @click="navigate">
           <i class="fa fa-user mr-3 text-gray my-2" aria-hidden="true"></i>
@@ -111,13 +111,13 @@
       class="sidebar-link text-muted sidebar-list-item position-bottom"
     >
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
-      <span v-if="actualUser">Salir {{actualUser.user}}</span>
+      <span v-if="actualUser">Salir {{ actualUser.user }}</span>
     </a>
   </div>
 </template>
 
 <script>
-import { mapState,mapActions } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   methods: {

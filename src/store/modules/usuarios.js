@@ -91,7 +91,7 @@ export default {
         }) {
             axios1({
                     method: "GET",
-                    url: this._vm.$url+"_users/_all_docs",
+                    url: this._vm.$url + "_users/_all_docs",
                 })
                 .then((res) => {
                     if (res.status === 200) {
@@ -183,7 +183,8 @@ export default {
                 });
             });
         },
-        initDBUsuarios({state,
+        initDBUsuarios({
+            state,
             dispatch
         }) {
             //Se agrega el nombre de la DB ("marca") en la función del inicio por eso no se pasa acá
@@ -203,26 +204,22 @@ export default {
                         path: "/login"
                     }).catch(() => {});
                 });
-                //el getAll debería ir luego de verificar si es admin
-                // remoteUsuarios.info().then((res) => {
-                //     console.log(JSON.stringify(res));
-                //     dispatch("getAll");
-                // }).catch(err => {
-                //     if (err.status === 401) {
-                //         console.log("no autorizado");
-                //         router.push({
-                //             path: "/login"
-                //         }).catch(() => {});
-                //     }
-                // });
             }).catch(console.log);
         },
         logout() {
+            console.log("out");
+            var timeOut = setTimeout(function () {
+                window.location.reload(true);
+            }, 1000); //wait 1 seconds
             remoteUsuarios.logout().then(() => {
+                clearTimeout(timeOut);
                 router.push({
                     path: "/login"
-                }).catch(console.log);
-            }).catch(console.log);
+                }).catch(console.error);
+            }).catch((error) => {
+                console.error(error);
+                window.location.reload(true);
+            });
         }
     }
 }
