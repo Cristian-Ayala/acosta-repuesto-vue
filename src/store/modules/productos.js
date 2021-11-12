@@ -320,32 +320,91 @@ export default {
         },
     },
     actions: {
-        createProducto({
+        async validarDatos({
+            state
+        }, productoDoc) {
+            try {
+                if (!productoDoc.upc) {
+                    throw new Error("Agregue un UPC");
+                }
+                var numbersOfUPCs;
+                numbersOfUPCs = await state.localProductos.find({
+                    selector: {
+                        "upc": productoDoc.upc
+                    }
+                }, ).then(response => {
+                    return response.docs;
+                }).catch((err) => {
+                    // an error occured
+                    console.error(err);
+                    return null;
+                });
+                if (!productoDoc.nombreProd) {
+                    throw new Error("El nombre no puede estar vacío");
+                }
+                if (!productoDoc.foto) {
+                    throw new Error("Tiene que agregar una foto");
+                }
+                if (!productoDoc.nombreMarca) {
+                    throw new Error("Tiene que agregar una Marca");
+                }
+                if (!productoDoc.nombreCategoria) {
+                    throw new Error("Tiene que agregar una Categoria");
+                }
+                if (!(productoDoc.precioMayoreo > 0)) {
+                    throw new Error("El precio de mayoreo no puede ser menor a 0");
+                }
+                if (!(productoDoc.precioPublico > 0)) {
+                    throw new Error("El precio de publico no puede ser menor a 0");
+                }
+                if (!(productoDoc.precioTaller > 0)) {
+                    throw new Error("El precio de taller no puede ser menor a 0");
+                }
+                return numbersOfUPCs;
+            } catch (error) {
+                return error;
+            }
+        },
+        async createProducto({
             state,
             commit,
             dispatch
         }, producto) {
             if (producto.length === 1) {
                 //Single add 
-                console.log(producto[0].doc)
-                var productoDoc = producto[0].doc;
-                productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
-                productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
-                productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
-                productoDoc._id = new Date().toISOString(); //For puchDB we need to add an _id field 
-                state.localProductos.put(productoDoc).then(() => {
-                    dispatch('readProducto').then(() => commit("successNotification", {
-                        "message": "Producto agregado con éxito",
-                        "tittle": "EXITO",
-                        "duration": 4000
-                    }));
-
-                }).catch((err) => {
+                try {
+                    var productoDoc = producto[0].doc;
+                    productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
+                    productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
+                    productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
+                    var totalNumberOfUPCs;
+                    totalNumberOfUPCs = await dispatch("validarDatos", productoDoc)
+                    if (!(typeof totalNumberOfUPCs.length === 'number')) {
+                        throw new Error(totalNumberOfUPCs);
+                    }
+                    if (totalNumberOfUPCs.length > 0) {
+                        throw new Error("Ya existe un producto con ese UPC");
+                    }
+                    productoDoc._id = new Date().toISOString(); //For puchDB we need to add an _id field 
+                    state.localProductos.put(productoDoc).then(() => {
+                        dispatch('readProducto').then(() => commit("successNotification", {
+                            "message": "Producto agregado con éxito",
+                            "tittle": "EXITO",
+                            "duration": 4000
+                        }));
+                    }).catch((err) => {
+                        commit("alertNotification", {
+                            "message": "Error al guardar el producto<br>" + err,
+                            "duration": 8000
+                        });
+                    });
+                } catch (err) {
                     commit("alertNotification", {
                         "message": "Error al guardar el producto<br>" + err,
-                        "duration": 8000
+                        "duration": 4000
                     });
-                });
+                }
+
             } else if (producto.length > 1) {
                 //bulk operation for desktop
             }
@@ -365,31 +424,49 @@ export default {
             }
             dispatch('readAllProducts');
         },
-        updateProducto({
+        async updateProducto({
             state,
             commit,
             dispatch
         }, producto) {
             if (producto.length === 1) {
-                //Single add 
-                console.log(producto[0].doc)
-                var productoDoc = producto[0].doc;
-                productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
-                productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
-                productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
-                state.localProductos.put(productoDoc).then(() => {
-                    dispatch('readProducto').then(() => commit("successNotification", {
-                        "message": "Producto modificado con éxito",
-                        "tittle": "EXITO",
-                        "duration": 4000
-                    }));
+                try {
+                    var productoDoc = producto[0].doc;
+                    productoDoc.precioMayoreo = Math.round(productoDoc.precioMayoreo * 100) / 100;
+                    productoDoc.precioPublico = Math.round(productoDoc.precioPublico * 100) / 100;
+                    productoDoc.precioTaller = Math.round(productoDoc.precioTaller * 100) / 100;
+                    var totalNumberOfUPCs;
+                    totalNumberOfUPCs = await dispatch("validarDatos", productoDoc)
+                    if (!(typeof totalNumberOfUPCs.length === 'number')) {
+                        throw new Error(totalNumberOfUPCs);
+                    }
+                    if (totalNumberOfUPCs.length > 0) {
+                        console.log("Se verifica que los _id's sean iguales");
+                        if (productoDoc._id !== totalNumberOfUPCs[0]._id) {
+                            console.log("No es el mismo doc así que no se modifica, se arroja error que el upc ya existe");
+                            throw new Error("El UPC ya existente. Sólo puede haber 1.")
+                        }
+                    }
+                    console.log("se cambia el upc, y todo el doc se actualiza");
+                    state.localProductos.put(productoDoc).then(() => {
+                        dispatch('readProducto').then(() => commit("successNotification", {
+                            "message": "Producto modificado con éxito",
+                            "tittle": "EXITO",
+                            "duration": 4000
+                        }));
 
-                }).catch((err) => {
-                    commit("alertNotification", {
-                        "message": "Error al modificar el producto<br>" + err,
-                        "duration": 8000
+                    }).catch((err) => {
+                        commit("alertNotification", {
+                            "message": "Error al modificar el producto<br>" + err,
+                            "duration": 8000
+                        });
                     });
-                });
+                } catch (err) {
+                    commit("alertNotification", {
+                        "message": "Error al guardar el producto<br>" + err,
+                        "duration": 4000
+                    });
+                }
             } else if (producto.length > 1) {
                 //bulk operation for desktop
             }

@@ -14,7 +14,10 @@
             /><span
               class="input-group-text"
               v-b-modal.barCode
-              @click="showBarcode = !showBarcode;setCalledFrom('AddEditProdMovile.vue')"
+              @click="
+                showBarcode = !showBarcode;
+                setCalledFrom('AddEditProdMovile.vue');
+              "
               ><i class="fas fa-barcode"
             /></span>
           </div>
@@ -36,16 +39,33 @@
         <div class="form-group row">
           <label class="col-md-3 form-control-label">Foto:</label>
           <div class="col-md-9" v-if="newProductMobile.doc">
+            <h6 v-if="error">{{ error }}</h6>
+            <div class="spinner-border" role="status" v-if="loadingEffect">
+              <span class="sr-only">Cargando...</span>
+            </div>
             <input
               type="file"
               accept="image/x-png,image/jpeg,image/webp"
               id="uploadPictures"
-              @change="upload()"
-              v-if="!imagePreview"
+              @change="
+                upload();
+                loadingEffect = true;
+                error = '';
+              "
+              v-if="!imagePreview && !loadingEffect"
               style="color: transparent"
             />
-            <div class="image-preview-container" v-if="imagePreview">
-              <img class="image-preview" :src="imagePreview" alt="Picture" width="150" height="100%"/>
+            <div
+              class="image-preview-container"
+              v-if="imagePreview && !loadingEffect"
+            >
+              <img
+                class="image-preview"
+                :src="imagePreview"
+                alt="Picture"
+                width="150"
+                height="100%"
+              />
               <b-button variant="danger" @click="imagePreview = ''"
                 >Quitar</b-button
               >
@@ -216,6 +236,8 @@ export default {
     return {
       imagePreview: "",
       showBarcode: false,
+      loadingEffect: false,
+      error: "",
     };
   },
   methods: {
@@ -225,7 +247,7 @@ export default {
       "marcaSelected",
       "categoriaSelected",
       "fotoSelected",
-      "setCalledFrom"
+      "setCalledFrom",
     ]),
     ...mapActions("productos", ["confirmation"]),
     ...mapMutations("marcas", ["clearData"]),
@@ -241,21 +263,42 @@ export default {
         const myFile = filePicker.files[0];
 
         //Options for file
-        const quality = 100;
+        var quality = 100;
         const width = "auto";
         const height = "auto";
-        const format = "jpeg";
-
-        fromBlob(myFile, quality, width, height, format).then((blob) => {
-          // will generate a url to the converted file
-          blobToURL(blob).then((url) => {
-            this.imagePreview = url;
-            this.fotoSelected(url);
-          });
-        });
+        const format = "webp";
+        this.checkSize(myFile, quality, width, height, format);
         //console.log(myFile);//prints the file in JSON
-
         resolve();
+      });
+    },
+    checkSize(myFile, quality, width, height, format) {
+      fromBlob(myFile, quality, width, height, format).then((blob) => {
+        console.log(blob);
+        if (blob.size > 400000) {
+          if (quality > 20) {
+            quality = quality - 20;
+            this.checkSize(myFile, quality, width, height, format);
+          } else if (quality === 20) {
+            quality = 10;
+            this.checkSize(myFile, quality, width, height, format);
+          } else if (quality === 10) {
+            quality = 1;
+            this.checkSize(myFile, quality, width, height, format);
+          }else{
+            this.error = "La imagen es demasiado grande";
+            this.loadingEffect = false;
+          }
+          return;
+        }
+        // will generate a url to the converted file
+        blobToURL(blob).then((url) => {
+          this.imagePreview = url;
+          this.fotoSelected(url);
+          this.loadingEffect = false;
+          console.log("KB length: " + blob.size) / 1e3;
+          console.log("MB: " + blob.size / 1e6);
+        });
       });
     },
     marcaSel(marca) {
@@ -378,6 +421,24 @@ display: inline-flex;
 
 ::v-deep div.dropdown.b-dropdown.m-2.btn-group {
   display: inline-flex;
+}
+.spinner-border {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  -webkit-animation: spinner-border 0.75s linear infinite;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 </style>
 

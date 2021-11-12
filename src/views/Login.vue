@@ -65,7 +65,6 @@ export default {
       remoteUsuarios
         .logIn(this.username, this.password)
         .then((res) => {
-          console.log(JSON.stringify(res));
           if (res.ok) {
             that.$router.push({ path: "/" });
           }
