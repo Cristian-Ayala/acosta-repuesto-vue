@@ -32,7 +32,7 @@
 </template>
 <script>
 import { mapState, mapMutations } from "vuex";
-import { StreamBarcodeReader } from "vue-barcode-reader";
+import StreamBarcodeReader from "@/components/StreamBarcodeReader.vue";
 export default {
   name: "UPCReader",
   components: {
