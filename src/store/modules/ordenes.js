@@ -1,5 +1,4 @@
-const ApiRestUrl = "url/productos/"
-
+var PouchDB = require('pouchdb').default;
 export default {
     namespaced: true,
     state: {
@@ -44,7 +43,6 @@ export default {
             "totalOrden": 0
         },
         searchDisplay: "",
-        urlApi: `${ApiRestUrl}orden`,
         marcas: [{
                 nombreMarca: "Motul",
                 activoMarca: true,
@@ -108,11 +106,23 @@ export default {
             cantidad: 0,
             descuento: 0
         }],
-        metPago: [{"name":"Tarjeta de Crédito"}, {"name":"Tarjeta de Débito"}, {"name":"Efectivo"}, {"name":"Credito Fiscal"},{"name":"Criptomoneda"}],
+        metPago: [{
+            "name": "Tarjeta de Crédito"
+        }, {
+            "name": "Tarjeta de Débito"
+        }, {
+            "name": "Efectivo"
+        }, {
+            "name": "Credito Fiscal"
+        }, {
+            "name": "Criptomoneda"
+        }],
         metPagoSelected: "",
         detalleOrden: [],
         activaOrd: [],
         prodSearch: "",
+        findProductos: [],
+        searchTotalRows: 0,
         // Esto va a servir para construir objetos ordenes
         productosObject: [],
         i: 0,
@@ -121,6 +131,8 @@ export default {
         delay: 700,
         clicks: 0,
         timer: null,
+        currentPage: 1,
+        skipPagination: 0,
     },
     mutations: {
         /*
@@ -141,10 +153,10 @@ export default {
             });
             this.detalleOrden = this.detalleOrden.filter(obj => obj.cantidadProd > 0);
             //Creando objeto para orden
-            this.orden.idMetodoPago = this.metPago.filter(metPag => metPag.nombrePago === this.metPagoSelected)[0].idMetodoPago;                
+            this.orden.idMetodoPago = this.metPago.filter(metPag => metPag.nombrePago === this.metPagoSelected)[0].idMetodoPago;
 
         },
-    restartObject: function () {
+        restartObject: function () {
             console.log("Me llamaron?")
             this.i++;
             this.j = 0;
@@ -183,8 +195,8 @@ export default {
             let array = (this.ordenes[valor].idOrden + this.ordenes[valor].observacionesOrden + this.ordenes[valor].totalOrden + this.ordenes[valor].nombreCliente).toUpperCase();
             return array.indexOf(this.searchDisplay.toUpperCase()) >= 0;
         },
-        filtroProd(state,valor) {
-            let x=0;
+        filtroProd(state, valor) {
+            let x = 0;
             if (x == 0) return true;
             if (state.prodSearch === "") return true;
             let array = (this.marcas.filter(mar => mar.idMarca === this.productos[valor].idMarca)[0].nombreMarca + this.categorias.filter(cat => cat.idCategoria === this.productos[valor].idCategoria)[0].nombreCat + this.productos[valor].nombreProd + this.productos[valor].descripcion + this.productos[valor].precioUnit + this.productos[valor].stockProd + this.productos[valor].upc).toUpperCase();
@@ -275,4 +287,94 @@ export default {
             }
         },
     },
+    actions: {
+        initDbOrdenes({
+            state,
+            dispatch
+        }) {
+            console.log(state, PouchDB);
+            dispatch("searchProductos")
+            // const remoteProductos = new state.PouchDB(this._vm.$url + "ordenes", {
+            //     fetch: function (url, opts) {
+            //         return state.PouchDB.fetch(url, opts, {
+            //             credentials: "include"
+            //         });
+            //     }
+            // });
+            // remoteProductos.info().catch(err => {
+            //     if (err.status === 401) {
+            //         console.log("no autorizado");
+            //         router.push({
+            //             path: "/login"
+            //         }).catch(() => {});
+            //     }
+            // });
+
+            // state.localProductos = new state.PouchDB("productos");
+            // // do one way, one-off sync from the server until completion
+            // state.localProductos.replicate.from(remoteProductos).on('complete', () => {
+            //     // console.log("Se terminó la replicación");
+            //     dispatch("readProducto");
+            //     //dispatch("createIndexes");
+            //     // then two-way, continuous, retriable sync
+            //     state.localProductos.sync(remoteProductos, {
+            //             live: true,
+            //             retry: true
+            //         }).on('change', function (change) {
+            //             console.log("yo, something changed!", change);
+            //             dispatch("readProducto");
+            //         }).on('paused', function (info) {
+            //             console.log("replication was paused, usually because of a lost connection", info);
+            //         }).on('active', function (info) {
+            //             console.log("replication was resumed", info);
+            //         }).on('denied', function (err) {
+            //             console.log("a document failed to replicate (e.g. due to permissions)", err);
+            //         })
+            //         .on('complete', function (info) {
+            //             console.log("Completado", info);
+            //         }).on('error', function (err) {
+            //             console.log("totally unhandled error (shouldn't happen)", err);
+            //         });
+            // })
+        },
+        searchProductos({
+            state
+        }, searchProduct) {
+            // console.log("This is the state from Ordenes :B\n", this.state.productos.localProductos);
+            this.state.productos.localProductos.search({
+                query: searchProduct,
+                fields: ['nombreProd', 'upc'],
+                include_docs: true,
+                highlighting: true,
+                limit: 10,
+                skip: state.skipPagination,
+                mm: '33%'
+            }).then(function (res) {
+                state.findProductos = res.rows;
+                state.searchTotalRows = res.total_rows;
+                console.log(res);
+            }).catch(function (err) {
+                console.err(err);
+            });
+        },
+        paginationNavPlugin({
+            state,
+            dispatch
+        }, {prevOrNext, searchProduct}) {
+            if (prevOrNext === "prev") {
+                if (state.currentPage > 1) {
+                    state.currentPage--;
+                    state.skipPagination = state.skipPagination - 10;
+                    dispatch("searchProductos", searchProduct);
+                }
+            } else {
+                let totalPages = Math.ceil(state.searchTotalRows / 10);
+                if (state.currentPage < totalPages) {
+                    state.currentPage++;
+                    state.skipPagination = state.skipPagination + 10;
+                    dispatch("searchProductos", searchProduct);
+                }
+            }
+        }
+    }
 }

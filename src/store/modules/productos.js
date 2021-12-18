@@ -1,6 +1,7 @@
 import router from '../../router/index'
 var PouchDB = require('pouchdb').default;
 PouchDB.plugin(require('pouchdb-find').default);
+PouchDB.plugin(require('pouchdb-quick-search'));
 export default {
     namespaced: true,
     state: {

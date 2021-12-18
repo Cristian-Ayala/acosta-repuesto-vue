@@ -1,5 +1,5 @@
 <template>
-  <div id="sidebar" class="sidebar py-3 shrink">
+  <div id="sidebar" class="sidebar shrink">
     <div
       class="
         text-gray-400 text-uppercase
@@ -108,7 +108,7 @@
     <a
       href="#"
       @click="logout()"
-      class="sidebar-link text-muted sidebar-list-item position-bottom"
+      class="sidebar-link text-muted sidebar-list-item position-bottom logout"
     >
       <i class="fas fa-door-open mr-3 text-black my-2" aria-hidden="true"></i>
       <span v-if="actualUser">Salir {{ actualUser.user }}</span>
@@ -145,5 +145,14 @@ export default {
   bottom: 0;
   margin-bottom: 1rem;
   width: inherit;
+}
+@media (max-height: 655px) {
+  .sidebar {
+    overflow-y: scroll;
+    padding-bottom: 2rem!important;
+  }
+  .logout{
+    position: static;
+  }
 }
 </style> 

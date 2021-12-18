@@ -14,7 +14,7 @@
       <transition name="side-in">
         <LeftSideBar v-if="isLeftSideBar" />
       </transition>
-      <router-view />
+      <router-view v-bind:class="{'noscroll':isLeftSideBar}"/>
     </div>
   </div>
 </template>
@@ -41,6 +41,7 @@ export default {
     ...mapActions("categorias", ["initDbCategorias"]),
     ...mapActions("productos", ["initDbProductos"]),
     ...mapActions("usuarios", ["initDBUsuarios"]),
+    ...mapActions("ordenes", ["initDbOrdenes"]),
   },
   created() {
     console.log("App.vue se instanció");
@@ -48,6 +49,7 @@ export default {
     this.initDbCategorias();
     this.initDbProductos();
     this.initDBUsuarios();
+    this.initDbOrdenes();
   },
 };
 </script>
@@ -66,5 +68,9 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.noscroll {
+  overflow: hidden;
+  position: fixed;
 }
 </style>

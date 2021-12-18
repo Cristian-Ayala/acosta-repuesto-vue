@@ -49,88 +49,9 @@
     </svg>
     <b-modal id="nuevaOrden" centered title="Nueva Orden">
       <div class="cuerpoModal">
-        <div class="sideBarMenu">
-          <b-list-group style="max-width: 13rem">
-            <b-list-group-item
-              class="d-flex align-items-center"
-              :class="{ tabSelected: paso === 'datos' }"
-              @click="paso = 'datos'"
-            >
-              <b-avatar variant="success" class="mr-3">
-                <svg
-                  viewBox="50 100 300 300"
-                  width="1em"
-                  height="1em"
-                  focusable="false"
-                  role="img"
-                  aria-label="person fill"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  class="b-icon bi"
-                >
-                  <g filter="">
-                    <use xlink:href="#person"></use>
-                  </g>
-                </svg>
-              </b-avatar>
-              <span class="mr-auto">Datos Personales</span>
-            </b-list-group-item>
-            <b-list-group-item
-              class="d-flex align-items-center"
-              :class="{ tabSelected: paso === 'productos' }"
-              @click="paso = 'productos'"
-            >
-              <b-avatar variant="success" class="mr-3">
-                <svg
-                  viewBox="7 7 16 16"
-                  width="1em"
-                  height="1em"
-                  focusable="false"
-                  role="img"
-                  aria-label="person fill"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  class="b-icon bi"
-                >
-                  <g filter="">
-                    <use xlink:href="#shopping-cart"></use>
-                  </g>
-                </svg>
-              </b-avatar>
-              <span class="mr-auto">Agregar Productos</span>
-            </b-list-group-item>
-            <b-list-group-item
-              class="d-flex align-items-center"
-              :class="{ tabSelected: paso === 'resumen' }"
-              @click="paso = 'resumen'"
-            >
-              <b-avatar variant="success" class="mr-3">
-                <svg
-                  viewBox="7 7 16 16"
-                  width="1em"
-                  height="1em"
-                  focusable="false"
-                  role="img"
-                  aria-label="person fill"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  class="b-icon bi"
-                >
-                  <g filter="">
-                    <use xlink:href="#credit-card"></use>
-                  </g>
-                </svg>
-              </b-avatar>
-              <span class="mr-auto">Pagar Orden</span>
-            </b-list-group-item>
-          </b-list-group>
-        </div>
         <div class="bodyMenu">
           <div class="datosPersonales" v-if="paso === 'datos'">
-            <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
+            <b-form class="d-flex justify-content-center mb-4 mt-4 ml-3" inline>
               <label for="fecha">Fecha de venta:&nbsp;&nbsp;&nbsp; </label>
               <date-pick
                 id="fecha"
@@ -143,7 +64,7 @@
                 :selectableYearRange="{ from: 2020, to: 2030 }"
               ></date-pick>
             </b-form>
-            <b-form class="justifySpace" inline>
+            <b-form class="justifySpace ml-3" inline>
               <div>
                 <label for="nombre">Nombre:&nbsp;&nbsp;&nbsp; </label>
                 <b-form-input
@@ -178,7 +99,7 @@
                 </dropdown>
               </div>
             </b-form>
-            <div>
+            <div class="ml-3 pr-3">
               <blockquote>
                 <p><b>Público:</b> Todos los clientes.</p>
 
@@ -194,53 +115,81 @@
             </div>
           </div>
           <div class="selProductos" v-show="paso === 'productos'">
-            <input type="search" placeholder="Buscar" v-model="buscar" />
-            <vue-good-table
-            title="Agrega Producto al Carrito"
-              :columns="columns"
-              :rows="productos"
-              max-height="50vh"
-              :fixed-header="true"
-              :search-options="{
-                enabled: true,
-                externalQuery: buscar,
-              }"
-            >
-              <template slot="table-row" slot-scope="props">
-                <span v-if="props.column.field == 'cantidad'" class="borrar2doSpan">
-                  <input
-                    type="number"
-                    id="cantidadProducto"
-                    min="0"
-                    :max="props.row.stockProd"
-                    value="0"
-                    size="6"
-                    class="form-control"
-                    v-model="props.row.cantidad"
-                    onKeyDown="return false"
-                    @change="changeProd($event, props.row)"
-                  />
-                  <!-- <b-form-spinbutton
-                    id="cantidadProducto"
-                    v-model="props.row.cantidad"
-                    min="0"
-                    :max="props.row.stockProd"
-                    placeholder="0"
-                    @change="changeProd($event, props.row)"
-                  ></b-form-spinbutton> -->
-                </span>
-                <span v-if="props.column.field == 'total'">
-                  {{
-                    props.row.cantidad * props.row.precioUnit > 0
-                      ? props.row.cantidad * props.row.precioUnit
-                      : "0"
-                  }}
-                </span>
-                <span v-else>
-                  {{ props.formattedRow[props.column.field] }}
-                </span>
-              </template>
-            </vue-good-table>
+            <div class="pl-3 pt-3 pb-3">
+              <input
+                type="search"
+                placeholder="Buscar"
+                v-model="searchProduct"
+              />
+              <p>Productos encontrados ({{ searchTotalRows }})</p>
+            </div>
+            <!-- Aquí tienen que ir los productos -->
+            <table class="table card-text">
+              <tbody v-if="findProductos">
+                <tr
+                  v-for="prod in findProductos"
+                  :key="prod.id"
+                  class="d-flex w-100 justify-content-between"
+                >
+                  <td class="imgCenter">
+                    <img :src="prod.doc.foto" height="50px" width="50px" />
+                  </td>
+                  <td>
+                    <div class="h-100">
+                      <p
+                        class="align-self-center"
+                        v-html="prod.highlighting.nombreProd"
+                      ></p>
+                      <h6 style="color: #009722">
+                        ${{ prod.doc.precioPublico }}
+                      </h6>
+                      Stock: {{ prod.doc.stockProd }}
+                      {{ ordenDetalleProductos[prod.upc] !== undefined }}
+                    </div>
+                  </td>
+                  <td
+                    class="tdVerdeClick"
+                    v-on:click="addTmpProducts(prod.doc)"
+                  >
+                    <div class="add">
+                      <i
+                        class="fas"
+                        :class="
+                          ordenDetalleProductos[prod.upc] !== undefined
+                            ? 'fa-check'
+                            : 'fa-plus'
+                        "
+                      ></i>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="endPagination">
+              <b-button
+                :disabled="!(currentPage > 1)"
+                v-on:click="
+                  paginationNavPlugin({ prevOrNext: 'prev', searchProduct })
+                "
+                class="btn btn-outline-success button-product"
+              >
+                <span> &lt; </span>
+              </b-button>
+              <b-button class="btn btn-outline-success button-product">
+                {{ currentPage }}
+              </b-button>
+              <b-button
+                :disabled="
+                  !(this.currentPage < Math.ceil(this.searchTotalRows / 10))
+                "
+                v-on:click="
+                  paginationNavPlugin({ prevOrNext: 'next', searchProduct })
+                "
+                class="btn btn-outline-success button-product"
+              >
+                <span> &gt; </span>
+              </b-button>
+            </div>
           </div>
         </div>
       </div>
@@ -255,18 +204,17 @@
         </b-button>
         <b-button
           size="m"
-          variant="warning"
           @click="paso = 'datos'"
           v-if="paso === 'productos'"
-          class="text-dark"
+          class="stepBack"
         >
           Atras
         </b-button>
         <b-button
           size="m"
-          variant="warning"
           @click="paso = 'productos'"
           v-if="paso === 'resumen'"
+          class="stepBack"
         >
           Atras
         </b-button>
@@ -304,62 +252,16 @@
 <script>
 import dropdown from "vue-dropdowns";
 import DatePick from "@/components/Calendario/vueDatePick.vue";
-import "vue-good-table/dist/vue-good-table.css";
-import { VueGoodTable } from "vue-good-table";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
   name: "NuevaOrden",
   components: {
     dropdown,
     DatePick,
-    VueGoodTable,
   },
   data() {
     return {
-      headerLabels: [
-        { key: "upc", label: "UPC" },
-        { key: "nombreProd", label: "Nombre" },
-        { key: "nombreMarca", label: "Marca" },
-        { key: "nombreCategoria", label: "Categoria" },
-        { key: "precioUnit", label: "P. U." },
-        "cantidad",
-        "descuento",
-        {
-          key: "total",
-          label: "Total",
-          formatter: (a, b, item) => {
-            return (
-              item.cantidad * item.precioUnit -
-              item.cantidad * item.precioUnit * (item.descuento / 100)
-            ).toFixed(2);
-          },
-        },
-      ],
-      columns: [
-        { field: "upc", label: "UPC" },
-        { field: "nombreProd", label: "Nombre" },
-        { field: "nombreMarca", label: "Marca" },
-        { field: "nombreCategoria", label: "Categoria" },
-        {
-          field: "precioUnit",
-          label: "P. U.",
-          type: "number",
-          globalSearchDisabled: true,
-        },
-        {
-          field: "cantidad",
-          label: "Cantidad",
-          globalSearchDisabled: true,
-          type: "number",
-        },
-        {
-          field: "total",
-          label: "Total",
-          globalSearchDisabled: true,
-        },
-      ],
-      buscar: "",
       object: {
         name: "Efectivo",
       },
@@ -379,6 +281,8 @@ export default {
       tipoOrden: {
         name: "Público",
       },
+      searchProduct: "",
+      ordenDetalleProductos: {},
     };
   },
   methods: {
@@ -389,6 +293,7 @@ export default {
       "filtroProd",
       "dosDecimalesProd",
     ]),
+    ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin"]),
     methodToRunOnSelect(payload) {
       console.log("hola");
       this.object = payload;
@@ -403,13 +308,84 @@ export default {
       console.log(cantidad);
       console.log(producto);
     },
+    addTmpProducts(ordenDetalleProductos, add = true) {
+      //----------------------------------------------------------------------------------
+      //With arrays
+      // console.log(ordenDetalleProductos);
+      // let indexProducto = this.ordenDetalleProductos.findIndex(
+      //   (prod) => prod.upc === ordenDetalleProductos.upc
+      // );
+      // console.log(indexProducto);
+      // if (indexProducto !== -1) {
+      //   console.log("true");
+      //   //Existe, entonce se elimina del carrito
+      //   this.ordenDetalleProductos.splice(indexProducto, 1);
+      // } else {
+      //   console.log("false");
+      //   //No existe, entonces se agrega al carrito
+      //   this.ordenDetalleProductos.push(ordenDetalleProductos);
+      // }
+      //----------------------------------------------------------------------------------
+      //With dictionaries
+      console.log("Flag 1");
+      console.log(
+        this.ordenDetalleProductos[ordenDetalleProductos.upc] !== undefined
+      );
+      console.log(this.ordenDetalleProductos[ordenDetalleProductos.upc]);
+      let prod;
+      //Check if product is already in the dictionary
+      if (this.ordenDetalleProductos[ordenDetalleProductos?.upc]) {
+        console.log("Exist");
+        //True: modify by 1 the quantity and update the total. Whether you add or decrease quantity
+        prod = this.ordenDetalleProductos[ordenDetalleProductos.upc];
+        if (add) {
+          //check if quantity is in stock range
+          if (prod.cantidad <= prod.stockProd) {
+            prod.cantidad += 1;
+            prod.subtotal = prod.cantidad * prod.precioPublico;
+          }
+        } else {
+          prod.cantidad -= 1;
+          prod.subtotal = prod.cantidad * prod.precioPublico;
+        }
+      } else {
+        //False: add the product to the dictionary
+        console.log("does not exist");
+        prod = {
+          ...ordenDetalleProductos,
+          cantidad: 1,
+          subtotal: ordenDetalleProductos.precioPublico,
+        };
+      }
+      // this.$set(this.ordenDetalleProductos, prod.upc, prod);
+      delete prod.foto;
+      this.ordenDetalleProductos[prod.upc] = Object.assign(
+        {},
+        {...prod} 
+      );
+    },
   },
   computed: {
-    ...mapState("ordenes", ["ordSelected", "showDetOrd", "orden", "metPago"]),
+    ...mapState("ordenes", [
+      "ordSelected",
+      "showDetOrd",
+      "orden",
+      "metPago",
+      "prodSearch",
+      "searchTotalRows",
+      "findProductos",
+      "currentPage",
+    ]),
     ...mapState("productos", ["productos"]),
   },
   mounted() {
     this.date = todayDate();
+  },
+  watch: {
+    searchProduct: function (val) {
+      // console.log("Watcheme prro", val);
+      this.searchProductos(val);
+    },
   },
 };
 function todayDate() {
@@ -424,6 +400,18 @@ function todayDate() {
 </script>
 
 <style scoped>
+.button-product {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  font-size: 12px;
+  background-color: #fff;
+  color: #28a745;
+}
+::v-deep p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 ::v-deep .modal-dialog {
   max-width: 100% !important;
   height: 100%;
@@ -496,9 +484,7 @@ function todayDate() {
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
 }
 .bodyMenu {
-  display: inline-block;
-  height: 100%;
-  width: calc(100% - 13rem);
+  /* height: 100%; */
   vertical-align: top;
   position: relative;
 }
@@ -507,10 +493,6 @@ function todayDate() {
   border-right: 0.5rem solid #28a745;
 }
 .datosPersonales {
-  padding-left: 2rem;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   width: 100%;
 }
 ::v-deep .vdpComponent input[type="text"] {
@@ -548,9 +530,10 @@ blockquote {
   border-left: 5px solid rgba(0, 0, 0, 0.1);
 }
 .selProductos {
-  padding: 2rem;
   width: 100%;
   height: 100%;
+  padding: 0 0.5rem;
+  background: #f8f9fb;
 }
 /* search input */
 input {
@@ -575,7 +558,7 @@ input[type="search"] {
     9px center;
   border: solid 1px #ccc;
   padding: 9px 10px 9px 32px;
-  width: 55px;
+  width: 55vw;
 
   -webkit-border-radius: 10em;
   -moz-border-radius: 10em;
@@ -586,7 +569,7 @@ input[type="search"] {
   transition: all 0.5s;
 }
 input[type="search"]:focus {
-  width: 30vw;
+  width: 70vw;
   background-color: #fff;
   border-color: #66cc75;
 
@@ -621,10 +604,37 @@ input::-webkit-input-placeholder {
 .descuento {
   max-width: 5rem;
 }
-/* Para eliminar el extra espan que se muestra en la tabla de productos */
-::v-deep #vgt-table > tbody > tr > td > span:nth-child(2)  {
-  display: none;
-}
 
 /* Fin del body del modal */
+.stepBack {
+  background-color: #0d2818;
+  border-color: #0d2818;
+  color: #fff;
+}
+.add {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.endPagination {
+  display: flex;
+  justify-content: space-evenly;
+  padding-bottom: 1rem;
+}
+
+::v-deep tr {
+  background-color: #fff;
+  margin: 0.5rem 0;
+  border-radius: 1rem;
+  box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
+}
+.imgCenter {
+  align-self: center;
+  border: none;
+}
+.tdVerdeClick {
+  background-color: #28a745;
+  border-radius: 0 1rem 1rem 0;
+  color: #fff;
+}
 </style>

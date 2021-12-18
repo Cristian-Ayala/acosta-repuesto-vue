@@ -187,7 +187,6 @@ video {
 .div-buttoms {
   display: flex;
   align-items: center;
-  align-items: end;
   height: 100%;
   place-content: center;
   padding-bottom: 1rem;
