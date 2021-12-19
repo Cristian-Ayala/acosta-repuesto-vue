@@ -310,13 +310,13 @@ export default {
           //check if quantity is in stock range
           if (prod.cantidad <= prod.stockProd) {
             prod.cantidad += 1;
-            prod.subtotal = prod.cantidad * prod.precioPublico;
+            prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
           }
         } else {
           if (prod.cantidad >= 1) {
             prod.cantidad -= 1;
-            prod.subtotal = prod.cantidad * prod.precioPublico;
-          } 
+            prod.subtotal = twoDecimalsOnly(prod.cantidad * prod.precioPublico);
+          }
         }
       } else {
         //False: add the product to the dictionary
@@ -324,7 +324,7 @@ export default {
         prod = {
           ...ordenDetalleProductos,
           cantidad: 1,
-          subtotal: ordenDetalleProductos.precioPublico,
+          subtotal: twoDecimalsOnly(ordenDetalleProductos.precioPublico),
         };
       }
       delete prod.foto;
@@ -343,7 +343,7 @@ export default {
         Object.values(this.ordenDetalleProductos).forEach(
           (prod) => (total += prod.subtotal)
         );
-        this.total = parseFloat(total.toFixed(2));
+        this.total = twoDecimalsOnly(total);
       } catch (error) {
         console.log(error);
       }
@@ -380,6 +380,14 @@ function todayDate() {
   var horas = today.getHours();
   var minutos = today.getMinutes();
   return `${dd}-${mm}-${yyyy} ${horas}:${minutos}`;
+}
+function twoDecimalsOnly(value) {
+  try {
+    return parseFloat(value).toFixed(2);
+  } catch (error) {
+    console.log(error);
+    return 0.0;
+  }
 }
 </script>
 
