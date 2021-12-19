@@ -284,6 +284,7 @@ export default {
       },
       searchProduct: "",
       ordenDetalleProductos: {},
+      total: 0.0,
     };
   },
   methods: {
@@ -295,19 +296,8 @@ export default {
       "dosDecimalesProd",
     ]),
     ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin"]),
-    methodToRunOnSelect(payload) {
-      console.log("hola");
-      this.object = payload;
-    },
     tipoOrdenMethod(payload) {
       this.tipoOrden = payload;
-    },
-    changeProd(cantidad, producto) {
-      console.log(producto.cantidad, producto.precioUnit);
-      producto.total = producto.cantidad * producto.precioUnit;
-      this.$nextTick(() => {});
-      console.log(cantidad);
-      console.log(producto);
     },
     addTmpProducts(ordenDetalleProductos, add = true, index) {
       let prod;
@@ -323,8 +313,10 @@ export default {
             prod.subtotal = prod.cantidad * prod.precioPublico;
           }
         } else {
-          prod.cantidad -= 1;
-          prod.subtotal = prod.cantidad * prod.precioPublico;
+          if (prod.cantidad >= 1) {
+            prod.cantidad -= 1;
+            prod.subtotal = prod.cantidad * prod.precioPublico;
+          } 
         }
       } else {
         //False: add the product to the dictionary

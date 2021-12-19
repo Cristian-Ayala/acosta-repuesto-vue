@@ -8,25 +8,33 @@
         <p class="align-self-center" v-html="prod.highlighting.nombreProd"></p>
         <h6 style="color: #009722">${{ prod.doc.precioPublico }}</h6>
         Stock: {{ prod.doc.stockProd }}
-        <div v-if="ordenDetalleProductos[prod.doc.upc] !== undefined">
-            <p>Cantidad: {{ ordenDetalleProductos[prod.doc.upc].cantidad }}</p>
-            <p>Subtotal: ${{ ordenDetalleProductos[prod.doc.upc].subtotal }}</p>
+        <div v-if="showQuantity">
+          <p>Cantidad: {{ ordenDetalleProductos[prod.doc.upc].cantidad }}</p>
+          <p>Subtotal: ${{ ordenDetalleProductos[prod.doc.upc].subtotal }}</p>
         </div>
       </div>
     </td>
-    <td
-      class="tdVerdeClick"
-      v-on:click="$emit('addTmpProducts', prod.doc, true, index)"
-    >
-      <div class="add">
-        <i
-          class="fas"
-          :class="
-            ordenDetalleProductos[prod.doc.upc] !== undefined
-              ? 'fa-check'
-              : 'fa-plus'
-          "
-        ></i>
+    <td class="tdVerdeClick">
+      <div
+        class="add"
+        v-if="!showQuantity"
+        v-on:click="$emit('addTmpProducts', prod.doc, true, index)"
+      >
+        <i class="fas fa-plus"></i>
+      </div>
+      <div v-else class="h-100">
+        <div
+          class="plus_minus"
+          v-on:click="$emit('addTmpProducts', prod.doc, true, index)"
+        >
+          <i class="fas fa-plus"></i>
+        </div>
+        <div
+          class="plus_minus"
+          v-on:click="$emit('addTmpProducts', prod.doc, false, index)"
+        >
+          <i class="fas fa-minus"></i>
+        </div>
       </div>
     </td>
   </tr>
@@ -37,11 +45,11 @@
 export default {
   name: "FindProductos",
   props: ["prod", "index", "ordenDetalleProductos"],
-  //   data() {
-  //     return {
-  //       ordenDetalleProductos: {},
-  //     };
-  //   },
+  data() {
+    return {
+      showQuantity: false,
+    };
+  },
   //   methods: {
   //     ...mapMutations("ordenes", [
   //       "change",
@@ -51,19 +59,11 @@ export default {
   //       "dosDecimalesProd",
   //     ]),
   //   },
-  //   computed: {
-  //     ...mapState("ordenes", [
-  //       "ordSelected",
-  //       "showDetOrd",
-  //       "orden",
-  //       "metPago",
-  //       "prodSearch",
-  //       "searchTotalRows",
-  //       "findProductos",
-  //       "currentPage",
-  //     ]),
-  //     ...mapState("productos", ["productos"]),
-  //   },
+  created() {
+    this.showQuantity =
+      this.ordenDetalleProductos[this.prod.doc.upc] !== undefined &&
+      this.ordenDetalleProductos[this.prod.doc.upc].cantidad >= 1;
+  },
 };
 </script>
 <style scoped>
@@ -78,6 +78,11 @@ export default {
 }
 .add {
   height: 100%;
+  display: flex;
+  align-items: center;
+}
+.plus_minus {
+  height: 50%;
   display: flex;
   align-items: center;
 }
