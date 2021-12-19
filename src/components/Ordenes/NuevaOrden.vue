@@ -48,6 +48,12 @@
       </g>
     </svg>
     <b-modal id="nuevaOrden" centered title="Nueva Orden">
+      <template v-slot:modal-header v-if="paso === 'productos'">
+        <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
+        <h4 class="d-flex align-items-center">
+          <b>Nueva Orden</b>
+        </h4>
+      </template>
       <div class="cuerpoModal">
         <div class="bodyMenu">
           <div class="datosPersonales" v-if="paso === 'datos'">
@@ -126,8 +132,8 @@
             <!-- Aquí tienen que ir los productos -->
             <table class="table card-text">
               <tbody v-if="findProductos">
-                <tr
-                  v-for="prod in findProductos"
+                <!-- <tr
+                  v-for="(prod, index) in findProductos"
                   :key="prod.id"
                   class="d-flex w-100 justify-content-between"
                 >
@@ -144,25 +150,32 @@
                         ${{ prod.doc.precioPublico }}
                       </h6>
                       Stock: {{ prod.doc.stockProd }}
-                      {{ ordenDetalleProductos[prod.upc] !== undefined }}
                     </div>
                   </td>
                   <td
                     class="tdVerdeClick"
-                    v-on:click="addTmpProducts(prod.doc)"
+                    v-on:click="addTmpProducts(prod.doc, true, index)"
                   >
                     <div class="add">
                       <i
                         class="fas"
                         :class="
-                          ordenDetalleProductos[prod.upc] !== undefined
+                          ordenDetalleProductos[prod.doc.upc] !== undefined
                             ? 'fa-check'
                             : 'fa-plus'
                         "
                       ></i>
                     </div>
                   </td>
-                </tr>
+                </tr> -->
+                <FindProductos
+                  v-for="(prod, index) in findProductos"
+                  :prod="prod"
+                  :index="index"
+                  :ordenDetalleProductos="ordenDetalleProductos"
+                  :key="prod.id"
+                  @addTmpProducts="addTmpProducts"
+                ></FindProductos>
               </tbody>
             </table>
             <div class="endPagination">
@@ -194,57 +207,43 @@
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
-        <b-button
-          size="m"
-          variant="secondary"
-          @click="cancel()"
-          v-if="paso === 'datos'"
-        >
-          Cancelar
-        </b-button>
-        <b-button
-          size="m"
-          @click="paso = 'datos'"
-          v-if="paso === 'productos'"
-          class="stepBack"
-        >
-          Atras
-        </b-button>
-        <b-button
-          size="m"
-          @click="paso = 'productos'"
-          v-if="paso === 'resumen'"
-          class="stepBack"
-        >
-          Atras
-        </b-button>
-        <b-button
-          size="m"
-          variant="success"
-          @click="paso = 'productos'"
-          v-if="paso === 'datos'"
-        >
-          Siguiente
-        </b-button>
-        <b-button
-          size="m"
-          variant="success"
-          @click="paso = 'resumen'"
-          v-if="paso === 'productos'"
-        >
-          Siguiente
-        </b-button>
-        <b-button
-          size="m"
-          variant="success"
-          @click="
-            ok();
-            paso = 'datos';
-          "
-          v-if="paso === 'resumen'"
-        >
-          Confirmar
-        </b-button>
+        <div v-if="paso === 'datos'" class="customFooter">
+          <b-button size="m" variant="secondary" @click="cancel()">
+            Cancelar
+          </b-button>
+          <b-button size="m" variant="success" @click="paso = 'productos'">
+            Siguiente
+          </b-button>
+        </div>
+        <div v-if="paso === 'productos'" class="total">
+          <div>
+            Total:
+            <h5 style="display: inline">${{ total }}</h5>
+          </div>
+          <b-button
+            size="m"
+            variant="success"
+            @click="paso = 'resumen'"
+            class="active rounded"
+          >
+            Siguiente
+          </b-button>
+        </div>
+        <div v-if="paso === 'resumen'" class="customFooter">
+          <b-button size="m" @click="paso = 'productos'" class="stepBack">
+            Atras
+          </b-button>
+          <b-button
+            size="m"
+            variant="success"
+            @click="
+              ok();
+              paso = 'datos';
+            "
+          >
+            Confirmar
+          </b-button>
+        </div>
       </template>
     </b-modal>
   </div>
@@ -252,6 +251,7 @@
 <script>
 import dropdown from "vue-dropdowns";
 import DatePick from "@/components/Calendario/vueDatePick.vue";
+import FindProductos from "@/components/Ordenes/FindProductos.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 
 export default {
@@ -259,6 +259,7 @@ export default {
   components: {
     dropdown,
     DatePick,
+    FindProductos,
   },
   data() {
     return {
@@ -308,30 +309,7 @@ export default {
       console.log(cantidad);
       console.log(producto);
     },
-    addTmpProducts(ordenDetalleProductos, add = true) {
-      //----------------------------------------------------------------------------------
-      //With arrays
-      // console.log(ordenDetalleProductos);
-      // let indexProducto = this.ordenDetalleProductos.findIndex(
-      //   (prod) => prod.upc === ordenDetalleProductos.upc
-      // );
-      // console.log(indexProducto);
-      // if (indexProducto !== -1) {
-      //   console.log("true");
-      //   //Existe, entonce se elimina del carrito
-      //   this.ordenDetalleProductos.splice(indexProducto, 1);
-      // } else {
-      //   console.log("false");
-      //   //No existe, entonces se agrega al carrito
-      //   this.ordenDetalleProductos.push(ordenDetalleProductos);
-      // }
-      //----------------------------------------------------------------------------------
-      //With dictionaries
-      console.log("Flag 1");
-      console.log(
-        this.ordenDetalleProductos[ordenDetalleProductos.upc] !== undefined
-      );
-      console.log(this.ordenDetalleProductos[ordenDetalleProductos.upc]);
+    addTmpProducts(ordenDetalleProductos, add = true, index) {
       let prod;
       //Check if product is already in the dictionary
       if (this.ordenDetalleProductos[ordenDetalleProductos?.upc]) {
@@ -357,12 +335,26 @@ export default {
           subtotal: ordenDetalleProductos.precioPublico,
         };
       }
-      // this.$set(this.ordenDetalleProductos, prod.upc, prod);
       delete prod.foto;
-      this.ordenDetalleProductos[prod.upc] = Object.assign(
-        {},
-        {...prod} 
-      );
+      this.ordenDetalleProductos[prod.upc] = Object.assign({}, { ...prod });
+      this.reRender(index);
+      this.calculateTotal();
+    },
+    reRender(index) {
+      let render = this.findProductos[index];
+      render.id = render.id + "a";
+      this.$set(this.findProductos, index, render);
+    },
+    calculateTotal() {
+      try {
+        let total = 0;
+        Object.values(this.ordenDetalleProductos).forEach(
+          (prod) => (total += prod.subtotal)
+        );
+        this.total = parseFloat(total.toFixed(2));
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   computed: {
@@ -611,11 +603,6 @@ input::-webkit-input-placeholder {
   border-color: #0d2818;
   color: #fff;
 }
-.add {
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
 .endPagination {
   display: flex;
   justify-content: space-evenly;
@@ -628,13 +615,31 @@ input::-webkit-input-placeholder {
   border-radius: 1rem;
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
 }
-.imgCenter {
-  align-self: center;
-  border: none;
+.ltStepBack {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: x-large;
+  background: transparent;
 }
-.tdVerdeClick {
+.total {
   background-color: #28a745;
-  border-radius: 0 1rem 1rem 0;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}
+::v-deep .modal-footer {
+  padding: 0%;
+  width: 100%;
+  display: block;
+}
+.customFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid #e9ecef;
 }
 </style>
