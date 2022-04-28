@@ -30,44 +30,8 @@
                 v-model="searchDisplay"
               />
             </div>
-            <table class="table card-text table-hover">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Nombre</th>
-                  <th>Fecha</th>
-                  <th>Total</th>
-                  <th>Descripción</th>
-                  <th>Operaciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(ord, index) in ordenes"
-                  v-show="filtro(index)"
-                  @click="clickRow(ord)"
-                  style="cursor: pointer; user-select: none"
-                  :key="ord.idOrden"
-                >
-                  <th>{{ ord.idOrden }}</th>
-                  <td>{{ ord.nombreCliente }}</td>
-                  <td>{{ ord.fechaOrd }}</td>
-                  <td>{{ ord.totalOrden }}</td>
-                  <td>{{ ord.observacionesOrden }}</td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn btn-danger"
-                      data-toggle="modal"
-                      data-target="#eliminarProducto"
-                      v-on:click="ordSelected = ord"
-                    >
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            
+            <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
           </div>
         </div>
       </div>
@@ -91,11 +55,13 @@
 import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
 import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
 import { mapState, mapMutations } from "vuex";
+import OrderView from '../components/Ordenes/OrderView.vue';
 export default {
   name: "Ordenes",
   components: {
     DetalleOrden,
     NuevaOrden,
+    OrderView,
   },
   data: () => {
     return {

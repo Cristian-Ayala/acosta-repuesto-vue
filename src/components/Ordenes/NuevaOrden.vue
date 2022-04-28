@@ -87,18 +87,28 @@
                   v-model="orden.telefono"
                 ></b-form-input>
               </div>
+              <div>
+                <label for="tel">Descripción:&nbsp;&nbsp;&nbsp; </label>
+                <b-form-textarea
+                  id="textareaDesc"
+                  class="mb-2 mr-sm-2 mb-sm-0"
+                  v-model="orden.observacionesOrden"
+                  rows="3"
+                  max-rows="6"
+                ></b-form-textarea>
+              </div>
             </b-form>
             <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
               <div>
-                <label for="tipoOrdenDropDown"
+                <label for="tipoDistribucionDropDown"
                   >Tipo de orden:&nbsp;&nbsp;&nbsp;
                 </label>
                 <dropdown
-                  id="tipoOrdenDropDown"
+                  id="tipoDistribucionDropDown"
                   class="dropdown"
-                  :options="tipoOrdenArray"
-                  :selected="tipoOrden"
-                  v-on:updateOption="tipoOrdenMethod"
+                  :options="tipoDistribucionArray"
+                  :selected="tipoDistribucion"
+                  v-on:updateOption="tipoDistribucionMethod"
                   :placeholder="'Público'"
                   :closeOnOutsideClick="true"
                 >
@@ -204,6 +214,25 @@
               </b-button>
             </div>
           </div>
+          <div class="resumenClass" v-if="paso === 'resumen'">
+            <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Resumen de la orden</h3>
+            <table class="table card-text">
+              <tbody v-if="ordenDetalleProductos">
+                <resumen-nueva-orden
+                  v-for="(prod, index) in ordenDetalleProductos"
+                  :prod="prod"
+                  :indexForComponent="index"
+                  :ordenDetalleProductos="ordenDetalleProductos"
+                  :key="prod.id"
+                  @addTmpProducts="addTmpProducts"
+                />
+                <div style="text-align: center;margin: 2rem 0;">
+                  Total:
+                  <h5 style="display: inline;">${{ total }}</h5>
+                </div>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
@@ -237,6 +266,7 @@
             size="m"
             variant="success"
             @click="
+              createOrder();
               ok();
               paso = 'datos';
             "
@@ -253,6 +283,7 @@ import dropdown from "vue-dropdowns";
 import DatePick from "@/components/Calendario/vueDatePick.vue";
 import FindProductos from "@/components/Ordenes/FindProductos.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
+import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
 
 export default {
   name: "NuevaOrden",
@@ -260,15 +291,16 @@ export default {
     dropdown,
     DatePick,
     FindProductos,
+    ResumenNuevaOrden,
   },
   data() {
     return {
-      object: {
+      metodoPago: {
         name: "Efectivo",
       },
       paso: "datos",
       date: "20-01-2021 14:30",
-      tipoOrdenArray: [
+      tipoDistribucionArray: [
         {
           name: "Público",
         },
@@ -279,7 +311,7 @@ export default {
           name: "Taller",
         },
       ],
-      tipoOrden: {
+      tipoDistribucion: {
         name: "Público",
       },
       searchProduct: "",
@@ -295,15 +327,15 @@ export default {
       "filtroProd",
       "dosDecimalesProd",
     ]),
-    ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin"]),
-    tipoOrdenMethod(payload) {
-      this.tipoOrden = payload;
+    ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin", "createRegistroOrdenes"]),
+    tipoDistribucionMethod(payload) {
+      this.tipoDistribucion = payload;
     },
-    addTmpProducts(ordenDetalleProductos, add = true, index) {
+    addTmpProducts(ordenDetalleProductos, add = true, index, triggeredFromComponent = false) {
       let prod;
       //Check if product is already in the dictionary
       if (this.ordenDetalleProductos[ordenDetalleProductos?.upc]) {
-        console.log("Exist");
+        // console.log("Exist");
         //True: modify by 1 the quantity and update the total. Whether you add or decrease quantity
         prod = this.ordenDetalleProductos[ordenDetalleProductos.upc];
         if (add) {
@@ -320,7 +352,7 @@ export default {
         }
       } else {
         //False: add the product to the dictionary
-        console.log("does not exist");
+        // console.log("does not exist");
         prod = {
           ...ordenDetalleProductos,
           cantidad: 1,
@@ -329,7 +361,14 @@ export default {
       }
       delete prod.foto;
       this.ordenDetalleProductos[prod.upc] = Object.assign({}, { ...prod });
-      this.reRender(index);
+      if (triggeredFromComponent) {
+        console.log(ordenDetalleProductos);
+        console.log(index);
+        // Index is returned as the UPC of the product
+        Object.assign(this.ordenDetalleProductos[prod.upc], { ...prod });
+      } else {
+        this.reRender(index);
+      }
       this.calculateTotal();
     },
     reRender(index) {
@@ -339,14 +378,31 @@ export default {
     },
     calculateTotal() {
       try {
-        let total = 0;
-        Object.values(this.ordenDetalleProductos).forEach(
-          (prod) => (total += prod.subtotal)
-        );
+        let total = 0.0;
+        Object.values(this.ordenDetalleProductos).forEach((prod) => {
+          total += twoDecimalsOnly(prod.subtotal);
+        });
         this.total = twoDecimalsOnly(total);
       } catch (error) {
         console.log(error);
       }
+    },
+    async createOrder() {
+      const orden = {
+        _id: new Date().toISOString(),
+        metodoPago: this.metodoPago.name,
+        fechaOrd: this.date,
+        tipoDistribucion: this.tipoDistribucion.name,
+        totalOrden: this.total,
+        productos: Object.values(this.ordenDetalleProductos),
+        status: "Completado",
+        tipoOrden: "Presencial", // Ir a dejar
+        ...this.orden
+      };
+      await this.createRegistroOrdenes(orden);
+      // Clear Data
+      this.ordenDetalleProductos = {};
+      this.total = 0.0;
     },
   },
   computed: {
@@ -383,7 +439,7 @@ function todayDate() {
 }
 function twoDecimalsOnly(value) {
   try {
-    return parseFloat(value).toFixed(2);
+    return Math.round(value * 100) / 100;
   } catch (error) {
     console.log(error);
     return 0.0;
@@ -602,6 +658,7 @@ input::-webkit-input-placeholder {
   background-color: #0d2818;
   border-color: #0d2818;
   color: #fff;
+  margin: 0 1rem;
 }
 .endPagination {
   display: flex;

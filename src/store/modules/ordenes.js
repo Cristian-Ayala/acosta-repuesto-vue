@@ -1,3 +1,4 @@
+import router from '../../router/index'
 var PouchDB = require('pouchdb').default;
 export default {
     namespaced: true,
@@ -37,7 +38,6 @@ export default {
             }]
         }],
         orden: {
-            "idMetodoPago": 0,
             "nombreCliente": "",
             "observacionesOrden": "",
             "totalOrden": 0
@@ -117,22 +117,19 @@ export default {
         }, {
             "name": "Criptomoneda"
         }],
-        metPagoSelected: "",
         detalleOrden: [],
         activaOrd: [],
         prodSearch: "",
         findProductos: [],
         searchTotalRows: 0,
-        // Esto va a servir para construir objetos ordenes
-        productosObject: [],
-        i: 0,
-        j: 0,
         showDetOrd: false,
         delay: 700,
         clicks: 0,
         timer: null,
         currentPage: 1,
         skipPagination: 0,
+        localOrdenes: null,
+        "PouchDB": PouchDB,
     },
     mutations: {
         /*
@@ -152,17 +149,7 @@ export default {
                 return objet;
             });
             this.detalleOrden = this.detalleOrden.filter(obj => obj.cantidadProd > 0);
-            //Creando objeto para orden
-            this.orden.idMetodoPago = this.metPago.filter(metPag => metPag.nombrePago === this.metPagoSelected)[0].idMetodoPago;
-
         },
-        restartObject: function () {
-            console.log("Me llamaron?")
-            this.i++;
-            this.j = 0;
-            this.productosObject = [];
-        },
-
         formatDate: function (date) {
             var hours = date.getHours();
             var minutes = date.getMinutes();
@@ -178,13 +165,8 @@ export default {
         limpiando valores de la marca previamente seleccionada
          */
         clearData() {
-            this.i = 0;
-            this.j = 0;
-            this.metPagoSelected = "";
             this.ordSelected = {};
-            this.productosObject = [];
             this.orden = {
-                "idMetodoPago": 0,
                 "nombreCliente": "",
                 "observacionesOrden": "",
                 "totalOrden": 0
@@ -213,9 +195,6 @@ export default {
         converterIdMar2MarName: function (idMarca) {
             return idMarca;
             // return this.marcas.filter(mar => mar.idMarca === idMarca)[0].nombreMarca;
-        },
-        converterIdMetPago2MetName: function (idMetodoPago) {
-            return this.metPago.filter(met => met.idMetodoPago === idMetodoPago)[0].nombrePago;
         },
         enforceMinMax(produ) {
             console.log("key up event, cant: ", produ.cantidad, " stock: ", produ.stockProd)
@@ -286,6 +265,30 @@ export default {
                 state.clicks = 0;
             }
         },
+        alertNotification(state, {
+            message,
+            duration
+        }) {
+            this._vm.$awn.alert(message, {
+                durations: {
+                    success: duration
+                }
+            });
+        },
+        successNotification(state, {
+            message,
+            duration,
+            tittle
+        }) {
+            this._vm.$awn.success(message, {
+                durations: {
+                    success: duration
+                },
+                labels: {
+                    success: tittle
+                }
+            });
+        }
     },
     actions: {
         initDbOrdenes({
@@ -294,48 +297,78 @@ export default {
         }) {
             console.log(state, PouchDB);
             dispatch("searchProductos")
-            // const remoteProductos = new state.PouchDB(this._vm.$url + "ordenes", {
-            //     fetch: function (url, opts) {
-            //         return state.PouchDB.fetch(url, opts, {
-            //             credentials: "include"
-            //         });
-            //     }
-            // });
-            // remoteProductos.info().catch(err => {
-            //     if (err.status === 401) {
-            //         console.log("no autorizado");
-            //         router.push({
-            //             path: "/login"
-            //         }).catch(() => {});
-            //     }
-            // });
+            const remoteOrdenes = new state.PouchDB(this._vm.$url + "ordenes", {
+                fetch: function (url, opts) {
+                    return state.PouchDB.fetch(url, opts, {
+                        credentials: "include"
+                    });
+                }
+            });
+            remoteOrdenes.info().catch(err => {
+                if (err.status === 401) {
+                    console.log("no autorizado");
+                    router.push({
+                        path: "/login"
+                    }).catch(() => {});
+                }
+            });
 
-            // state.localProductos = new state.PouchDB("productos");
-            // // do one way, one-off sync from the server until completion
-            // state.localProductos.replicate.from(remoteProductos).on('complete', () => {
-            //     // console.log("Se terminó la replicación");
-            //     dispatch("readProducto");
-            //     //dispatch("createIndexes");
-            //     // then two-way, continuous, retriable sync
-            //     state.localProductos.sync(remoteProductos, {
-            //             live: true,
-            //             retry: true
-            //         }).on('change', function (change) {
-            //             console.log("yo, something changed!", change);
-            //             dispatch("readProducto");
-            //         }).on('paused', function (info) {
-            //             console.log("replication was paused, usually because of a lost connection", info);
-            //         }).on('active', function (info) {
-            //             console.log("replication was resumed", info);
-            //         }).on('denied', function (err) {
-            //             console.log("a document failed to replicate (e.g. due to permissions)", err);
-            //         })
-            //         .on('complete', function (info) {
-            //             console.log("Completado", info);
-            //         }).on('error', function (err) {
-            //             console.log("totally unhandled error (shouldn't happen)", err);
-            //         });
-            // })
+            state.localOrdenes = new state.PouchDB("ordenes");
+            // do one way, one-off sync from the server until completion
+            state.localOrdenes.replicate.from(remoteOrdenes).on('complete', () => {
+                // console.log("Se terminó la replicación");
+                dispatch("readAllOrdenes"); // Get all de ordenes
+                //dispatch("createIndexes");
+                // then two-way, continuous, retriable sync
+                state.localOrdenes.sync(remoteOrdenes, {
+                        live: true,
+                        retry: true
+                    }).on('change', function (change) {
+                        console.log("yo, something changed!", change);
+                        dispatch("readAllOrdenes"); // Get all de ordenes
+                    }).on('paused', function (info) {
+                        console.log("replication was paused, usually because of a lost connection", info);
+                    }).on('active', function (info) {
+                        console.log("replication was resumed", info);
+                    }).on('denied', function (err) {
+                        console.log("a document failed to replicate (e.g. due to permissions)", err);
+                    })
+                    .on('complete', function (info) {
+                        console.log("Completado", info);
+                    }).on('error', function (err) {
+                        console.log("totally unhandled error (shouldn't happen)", err);
+                    });
+            })
+        },
+        async createRegistroOrdenes({ state, commit }, orden) {
+            console.log(orden);
+            //For puchDB we need to add an _id field 
+            return state.localOrdenes.put(orden).then((result) => {
+                console.log("created", result);
+                commit("successNotification", {
+                    "message": "Marca agregada con éxito",
+                    "tittle": "EXITO",
+                    "duration": 4000
+                })
+            }).catch((err) => {
+                commit("alertNotification", {
+                    "message": "Error al guardar la marca<br>" + err,
+                    "duration": 4000
+                });
+                console.error("error trying insert order", err);
+            });
+        },
+        readAllOrdenes({ state }) {
+            return state.localOrdenes.allDocs({
+                include_docs: true,
+                descending: false
+            }).then((result) => {
+                console.log("read", result);
+                state.ordenes = result.rows;
+            }).catch((err) => {
+                console.error("error trying read all orders", err);
+            }
+            );
         },
         searchProductos({
             state
@@ -352,7 +385,7 @@ export default {
             }).then(function (res) {
                 state.findProductos = res.rows;
                 state.searchTotalRows = res.total_rows;
-                console.log(res);
+                // console.log(res);
             }).catch(function (err) {
                 console.err(err);
             });
