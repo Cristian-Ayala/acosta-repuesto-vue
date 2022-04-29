@@ -48,8 +48,6 @@ export default {
     };
   },
   created() {
-    console.log(this.prod);
-    console.log(this.indexForComponent);
     this.showQuantity =
       this.ordenDetalleProductos[this.prod.upc] !== undefined &&
       this.ordenDetalleProductos[this.prod.upc].cantidad >= 1;

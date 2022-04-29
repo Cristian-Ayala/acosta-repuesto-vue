@@ -40,7 +40,6 @@ export default {
         orden: {
             "nombreCliente": "",
             "observacionesOrden": "",
-            "totalOrden": 0
         },
         searchDisplay: "",
         marcas: [{
@@ -159,18 +158,6 @@ export default {
             minutes = minutes < 10 ? '0' + minutes : minutes;
             var strTime = hours + ':' + minutes + ' ' + ampm;
             return date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear() + " " + strTime;
-        },
-
-        /*
-        limpiando valores de la marca previamente seleccionada
-         */
-        clearData() {
-            this.ordSelected = {};
-            this.orden = {
-                "nombreCliente": "",
-                "observacionesOrden": "",
-                "totalOrden": 0
-            }
         },
         filtro(valor) {
             if (this.searchDisplay === "") return true;
@@ -340,19 +327,18 @@ export default {
                     });
             })
         },
-        async createRegistroOrdenes({ state, commit }, orden) {
-            console.log(orden);
+        async createRegistroOrdenes({ state, commit, dispatch }, orden) {
             //For puchDB we need to add an _id field 
-            return state.localOrdenes.put(orden).then((result) => {
-                console.log("created", result);
+            return state.localOrdenes.put(orden).then(() => {
+                dispatch("readAllOrdenes");
                 commit("successNotification", {
-                    "message": "Marca agregada con éxito",
+                    "message": "Orden agregada con éxito",
                     "tittle": "EXITO",
                     "duration": 4000
                 })
             }).catch((err) => {
                 commit("alertNotification", {
-                    "message": "Error al guardar la marca<br>" + err,
+                    "message": "Error al guardar la orden<br>" + err,
                     "duration": 4000
                 });
                 console.error("error trying insert order", err);

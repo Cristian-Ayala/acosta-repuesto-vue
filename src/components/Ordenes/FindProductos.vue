@@ -46,9 +46,7 @@ export default {
   name: "FindProductos",
   props: ["prod", "index", "ordenDetalleProductos"],
   data() {
-    return {
-      showQuantity: false,
-    };
+    return {};
   },
   //   methods: {
   //     ...mapMutations("ordenes", [
@@ -59,10 +57,21 @@ export default {
   //       "dosDecimalesProd",
   //     ]),
   //   },
-  created() {
-    this.showQuantity =
-      this.ordenDetalleProductos[this.prod.doc.upc] !== undefined &&
-      this.ordenDetalleProductos[this.prod.doc.upc].cantidad >= 1;
+  computed: {
+    showQuantity: function () {
+      return (
+        typeof this.ordenDetalleProductos != "undefined" &&
+        Object.hasOwnProperty.call(
+          this.ordenDetalleProductos,
+          this.prod.doc.upc
+        ) &&
+        Object.hasOwnProperty.call(
+          this.ordenDetalleProductos[this.prod.doc.upc],
+          "cantidad"
+        ) &&
+        this.ordenDetalleProductos[this.prod.doc.upc].cantidad >= 1
+      );
+    },
   },
 };
 </script>

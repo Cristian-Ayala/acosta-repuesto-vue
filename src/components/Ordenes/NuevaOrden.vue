@@ -267,8 +267,8 @@
             variant="success"
             @click="
               createOrder();
-              ok();
               paso = 'datos';
+              ok();
             "
           >
             Confirmar
@@ -388,6 +388,8 @@ export default {
       }
     },
     async createOrder() {
+      let localOrder = { ...this.orden }
+      delete localOrder.totalOrden;
       const orden = {
         _id: new Date().toISOString(),
         metodoPago: this.metodoPago.name,
@@ -397,12 +399,17 @@ export default {
         productos: Object.values(this.ordenDetalleProductos),
         status: "Completado",
         tipoOrden: "Presencial", // Ir a dejar
-        ...this.orden
+        ...localOrder
       };
       await this.createRegistroOrdenes(orden);
       // Clear Data
       this.ordenDetalleProductos = {};
       this.total = 0.0;
+      this.paso = "datos";
+      this.orden = {
+          "nombreCliente": "",
+          "observacionesOrden": "",
+      }
     },
   },
   computed: {
