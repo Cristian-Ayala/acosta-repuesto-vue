@@ -1,22 +1,23 @@
 <template>
   <div class="order">
     <div id="leftSide">
-      <b-avatar variant="success">
-          <i class="fas fa-store"></i>
+      <b-avatar :variant="statusColor">
+          <i class="fas fa-store" v-if="orden.tipoOrden === 'Local'"></i>
+          <i class="fas fa-motorcycle" v-else></i>
       </b-avatar>
     </div>
     <div id="rigthSide">
       <div class="orderName" v-if="orden && orden.nombreCliente">
         {{ orden.nombreCliente }}
       </div>
-      <div v-if="orden && orden.fechaOrd">
-        {{ orden.fechaOrd }}
+      <div v-if="orden && orden._id">
+        {{ formatDate(orden._id) }}
       </div>
       <div v-if="orden && orden.telefono">
         {{ orden.telefono }}
       </div>
       <div v-if="orden && typeof orden.totalOrden === 'number'">
-        {{ orden.totalOrden }}
+        $ {{ orden.totalOrden }}
       </div>
       <a href="#" @click="showModalViewDetails = true"> Ver detalles </a>
     </div>
@@ -30,6 +31,32 @@ export default {
       showModalViewDetails: false,
     };
   },
+  methods: {
+    formatDate(id) {
+        let date = new Date(id);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+    },
+  },
+  computed: {
+    statusColor: function () {
+        if (!this.orden) return "danger";
+        
+        switch (this.orden.status) {
+            case "Completado":
+                return "success";
+            case "En proceso":
+                return "warning";
+            case "En camino":
+                return "primary";
+            default:
+                // In case of cancelado
+                return "danger";
+        }
+    },
+  },
+  mounted() {
+    console.log({ ...this.orden });
+},
 };
 </script>
 <style scoped>

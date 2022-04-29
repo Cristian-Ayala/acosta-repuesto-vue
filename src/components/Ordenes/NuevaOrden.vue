@@ -65,9 +65,9 @@
                 :inputAttributes="{ readonly: true }"
                 :pickTime="true"
                 :use12HourClock="true"
-                :format="'DD-MM-YYYY HH:mm'"
+                :format="'MM-DD-YYYY HH:mm'"
                 :displayFormat="'DD-MM-YYYY H:mm A'"
-                :selectableYearRange="{ from: 2020, to: 2030 }"
+                :selectableYearRange="{ from: 2020, to: 2050 }"
               ></date-pick>
             </b-form>
             <b-form class="justifySpace ml-3" inline>
@@ -106,9 +106,24 @@
                 <dropdown
                   id="tipoDistribucionDropDown"
                   class="dropdown"
+                  :options="dropDownTypeOfOrder.data"
+                  :selected="dropDownTypeOfOrder.selected"
+                  v-on:updateOption="(payload) => dropDownTypeOfOrder.selected = payload"
+                  :placeholder="dropDownTypeOfOrder.data[0].name"
+                  :closeOnOutsideClick="true"
+                >
+                </dropdown>
+              </div>
+              <div>
+                <label for="tipoDistribucionDropDown"
+                  >Tipo de Distribución:&nbsp;&nbsp;&nbsp;
+                </label>
+                <dropdown
+                  id="tipoDistribucionDropDown"
+                  class="dropdown"
                   :options="tipoDistribucionArray"
                   :selected="tipoDistribucion"
-                  v-on:updateOption="tipoDistribucionMethod"
+                  v-on:updateOption="(payload) => tipoDistribucion = payload"
                   :placeholder="'Público'"
                   :closeOnOutsideClick="true"
                 >
@@ -314,6 +329,16 @@ export default {
       tipoDistribucion: {
         name: "Público",
       },
+      dropDownTypeOfOrder: {
+        data: [{
+            "name": "Local"
+        }, {
+            "name": "Delivery"
+        }],
+        selected: {
+            "name": "Local"
+        },
+      },
       searchProduct: "",
       ordenDetalleProductos: {},
       total: 0.0,
@@ -328,9 +353,6 @@ export default {
       "dosDecimalesProd",
     ]),
     ...mapActions("ordenes", ["searchProductos", "paginationNavPlugin", "createRegistroOrdenes"]),
-    tipoDistribucionMethod(payload) {
-      this.tipoDistribucion = payload;
-    },
     addTmpProducts(ordenDetalleProductos, add = true, index, triggeredFromComponent = false) {
       let prod;
       //Check if product is already in the dictionary
@@ -391,14 +413,13 @@ export default {
       let localOrder = { ...this.orden }
       delete localOrder.totalOrden;
       const orden = {
-        _id: new Date().toISOString(),
+        _id: `${new Date(this.date).toISOString().slice(0, -7)}${new Date().toISOString().slice(17)}`,
         metodoPago: this.metodoPago.name,
-        fechaOrd: this.date,
         tipoDistribucion: this.tipoDistribucion.name,
         totalOrden: this.total,
         productos: Object.values(this.ordenDetalleProductos),
-        status: "Completado",
-        tipoOrden: "Presencial", // Ir a dejar
+        status: this.dropDownTypeOfOrder.selected.name === "Local" ? "Completado" : "En proceso",
+        tipoOrden: this.dropDownTypeOfOrder.selected.name, // Ir a dejar
         ...localOrder
       };
       await this.createRegistroOrdenes(orden);
@@ -442,7 +463,7 @@ function todayDate() {
   var yyyy = today.getFullYear();
   var horas = today.getHours();
   var minutos = today.getMinutes();
-  return `${dd}-${mm}-${yyyy} ${horas}:${minutos}`;
+  return `${mm}-${dd}-${yyyy} ${horas}:${minutos}`;
 }
 function twoDecimalsOnly(value) {
   try {
