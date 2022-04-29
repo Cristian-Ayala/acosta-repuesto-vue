@@ -28,12 +28,12 @@
                 placeholder="Buscar orden..."
                 class="form-control form-control-sm border-0 no-shadow pl-4"
                 v-model="searchDisplay"
+                style="border-radius: 0 0 1rem 1rem;"
               />
             </div>
-            
-            <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
           </div>
         </div>
+        <order-view v-for="orden in ordenes" :key="orden.id" :orden="orden.doc"></order-view>
       </div>
       <button
         type="button"
@@ -106,5 +106,8 @@ input[type="number"] {
 }
 .card-body {
   padding: 0%;
+}
+.card {
+    background-color: #f7f8fa;
 }
 </style>
