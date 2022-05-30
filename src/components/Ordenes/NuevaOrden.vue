@@ -1,52 +1,5 @@
 <template>
   <div>
-    <svg
-      id="svg-source"
-      height="0"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      style="position: absolute"
-    >
-      <g
-        id="shopping-cart"
-        data-iconmelon="e-commerce icons:7c96e2dece0152dc594d66b260f79db0"
-      >
-        <path
-          d="M22.463,25.841c0.528,0,0.918-0.429,0.918-0.958v-6.786c0-0.529-0.39-0.958-0.918-0.958c-0.529,0-0.92,0.429-0.92,0.958
-	v6.786C21.543,25.413,21.934,25.841,22.463,25.841z M18.156,25.841c0.529,0,0.919-0.429,0.919-0.958v-6.786
-	c0-0.529-0.39-0.958-0.919-0.958s-0.919,0.429-0.919,0.958v6.786C17.237,25.413,17.627,25.841,18.156,25.841z M13.851,25.841
-	c0.528,0,0.919-0.429,0.919-0.958v-6.786c0-0.529-0.391-0.958-0.919-0.958c-0.529,0-0.919,0.429-0.919,0.958v6.786
-	C12.932,25.413,13.321,25.841,13.851,25.841z M29.426,8.511h-5.327l-2.731-4.396c-0.342-0.593-0.98-0.961-1.666-0.961
-	c-0.336,0-0.668,0.089-0.959,0.258c-0.918,0.529-1.233,1.707-0.689,2.647l1.564,2.451h-7.976l1.58-2.475
-	c0.529-0.917,0.214-2.095-0.704-2.624c-0.292-0.169-0.623-0.258-0.959-0.258c-0.686,0-1.323,0.368-1.655,0.943L7.161,8.511H2.574
-	C1.155,8.511,0,9.667,0,11.086v1.47c0,1.274,0.934,2.525,2.152,2.728l1.931,11.042c0.03,1.394,1.173,2.519,2.573,2.519h18.605
-	c1.401,0,2.545-1.125,2.574-2.52l1.921-11.032C31.019,15.128,32,13.862,32,12.556v-1.47C32,9.667,30.845,8.511,29.426,8.511z
-	M26.615,26.167l-0.009,0.104c0,0.741-0.604,1.344-1.345,1.344H6.656c-0.741,0-1.344-0.603-1.344-1.344L3.407,15.327h25.096
-	L26.615,26.167z M30.77,12.556c0,0.74-0.603,1.541-1.344,1.541H2.574c-0.741,0-1.344-0.8-1.344-1.541v-1.47
-	c0-0.741,0.603-1.344,1.344-1.344h5.271l3.113-5.011c0.184-0.318,0.623-0.439,0.944-0.253c0.33,0.19,0.444,0.614,0.268,0.92
-	L9.396,9.742h12.467l-2.76-4.32c-0.189-0.33-0.076-0.753,0.253-0.944c0.323-0.186,0.756-0.074,0.955,0.27l3.104,4.994h6.011
-	c0.741,0,1.344,0.603,1.344,1.344V12.556z M9.545,25.841c0.528,0,0.918-0.429,0.918-0.958v-6.786c0-0.529-0.39-0.958-0.918-0.958
-	c-0.529,0-0.919,0.429-0.919,0.958v6.786C8.626,25.413,9.016,25.841,9.545,25.841z"
-        ></path>
-      </g>
-      <g
-        id="credit-card"
-        data-iconmelon="e-commerce icons:c3144b166f93e0f6b73aee04a0a48397"
-      >
-        <path
-          d="M29.018,4.751H2.981C1.337,4.751,0,6.089,0,7.733v16.534c0,1.644,1.337,2.981,2.981,2.981h26.036
-	c1.645,0,2.982-1.338,2.982-2.981V7.733C32,6.089,30.662,4.751,29.018,4.751z M30.638,24.267c0,0.893-0.727,1.62-1.621,1.62H2.981
-	c-0.893,0-1.62-0.727-1.62-1.62V13.603h29.276V24.267z M30.638,10.236H1.362V7.733c0-0.894,0.727-1.62,1.62-1.62h26.036
-	c0.894,0,1.621,0.727,1.621,1.62V10.236z M8.848,22.494H2.724v1.338h6.124V22.494z M19.043,22.494H9.548v1.338h9.495V22.494z"
-        ></path>
-      </g>
-      <g id="person">
-        <path
-          d="M313.6 304c-28.7 0-42.5 16-89.6 16-47.1 0-60.8-16-89.6-16C60.2 304 0 364.2 0 438.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-25.6c0-74.2-60.2-134.4-134.4-134.4zM400 464H48v-25.6c0-47.6 38.8-86.4 86.4-86.4 14.6 0 38.3 16 89.6 16 51.7 0 74.9-16 89.6-16 47.6 0 86.4 38.8 86.4 86.4V464zM224 288c79.5 0 144-64.5 144-144S303.5 0 224 0 80 64.5 80 144s64.5 144 144 144zm0-240c52.9 0 96 43.1 96 96s-43.1 96-96 96-96-43.1-96-96 43.1-96 96-96z"
-        ></path>
-      </g>
-    </svg>
     <b-modal id="nuevaOrden" centered title="Nueva Orden">
       <template v-slot:modal-header v-if="paso === 'productos'">
         <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
@@ -100,11 +53,11 @@
             </b-form>
             <b-form class="d-flex justify-content-center mb-4 mt-5" inline>
               <div>
-                <label for="tipoDistribucionDropDown"
+                <label for="tipoOrdenSelection"
                   >Tipo de orden:&nbsp;&nbsp;&nbsp;
                 </label>
                 <dropdown
-                  id="tipoDistribucionDropDown"
+                  id="tipoOrdenSelection"
                   class="dropdown"
                   :options="dropDownTypeOfOrder.data"
                   :selected="dropDownTypeOfOrder.selected"
@@ -157,42 +110,6 @@
             <!-- Aquí tienen que ir los productos -->
             <table class="table card-text">
               <tbody v-if="findProductos">
-                <!-- <tr
-                  v-for="(prod, index) in findProductos"
-                  :key="prod.id"
-                  class="d-flex w-100 justify-content-between"
-                >
-                  <td class="imgCenter">
-                    <img :src="prod.doc.foto" height="50px" width="50px" />
-                  </td>
-                  <td>
-                    <div class="h-100">
-                      <p
-                        class="align-self-center"
-                        v-html="prod.highlighting.nombreProd"
-                      ></p>
-                      <h6 style="color: #009722">
-                        ${{ prod.doc.precioPublico }}
-                      </h6>
-                      Stock: {{ prod.doc.stockProd }}
-                    </div>
-                  </td>
-                  <td
-                    class="tdVerdeClick"
-                    v-on:click="addTmpProducts(prod.doc, true, index)"
-                  >
-                    <div class="add">
-                      <i
-                        class="fas"
-                        :class="
-                          ordenDetalleProductos[prod.doc.upc] !== undefined
-                            ? 'fa-check'
-                            : 'fa-plus'
-                        "
-                      ></i>
-                    </div>
-                  </td>
-                </tr> -->
                 <FindProductos
                   v-for="(prod, index) in findProductos"
                   :prod="prod"
@@ -248,6 +165,25 @@
               </tbody>
             </table>
           </div>
+          <div class="metPago" v-if="paso === 'pago'">
+            <h3 class="pl-2" style="text-align: center;padding: 1rem 0;">Método de pago</h3>
+            <div style="text-align: center;margin: 2rem 0;">
+              Total:
+              <h5 style="display: inline;">${{ total }}</h5>
+            </div>
+            <div id="metPagoDropdown">
+              <dropdown
+                id="metPagoSelection"
+                class="dropdown"
+                :options="dropDownMetodoPago.data"
+                :selected="dropDownMetodoPago.selected"
+                v-on:updateOption="(payload) => dropDownMetodoPago.selected = payload"
+                :placeholder="dropDownMetodoPago.data[0].name"
+                :closeOnOutsideClick="true"
+              >
+              </dropdown>
+            </div>
+          </div>
         </div>
       </div>
       <template #modal-footer="{ cancel, ok }">
@@ -259,7 +195,7 @@
             Siguiente
           </b-button>
         </div>
-        <div v-if="paso === 'productos'" class="total">
+        <div v-else-if="paso === 'productos'" class="total">
           <div>
             Total:
             <h5 style="display: inline">${{ total }}</h5>
@@ -269,12 +205,25 @@
             variant="success"
             @click="paso = 'resumen'"
             class="active rounded"
+            :disabled="total <= 0"
           >
             Siguiente
           </b-button>
         </div>
-        <div v-if="paso === 'resumen'" class="customFooter">
+        <div v-else-if="paso === 'resumen'" class="customFooter">
           <b-button size="m" @click="paso = 'productos'" class="stepBack">
+            Atras
+          </b-button>
+          <b-button
+            size="m"
+            variant="success"
+            @click="paso = 'pago'"
+          >
+            Pagar
+          </b-button>
+        </div>
+        <div v-else-if="paso === 'pago'" class="customFooter">
+          <b-button size="m" @click="paso = 'resumen'" class="stepBack">
             Atras
           </b-button>
           <b-button
@@ -310,9 +259,6 @@ export default {
   },
   data() {
     return {
-      metodoPago: {
-        name: "Efectivo",
-      },
       paso: "datos",
       date: "20-01-2021 14:30",
       tipoDistribucionArray: [
@@ -337,6 +283,22 @@ export default {
         }],
         selected: {
             "name": "Local"
+        },
+      },
+      dropDownMetodoPago: {
+        data: [{
+            "name": "Tarjeta de Crédito"
+        }, {
+            "name": "Tarjeta de Débito"
+        }, {
+            "name": "Efectivo"
+        }, {
+            "name": "Credito Fiscal"
+        }, {
+            "name": "Criptomoneda"
+        }],
+        selected: {
+            "name": "Efectivo"
         },
       },
       searchProduct: "",
@@ -414,7 +376,7 @@ export default {
       delete localOrder.totalOrden;
       const orden = {
         _id: `${new Date(this.date).toISOString().slice(0, -7)}${new Date().toISOString().slice(17)}`,
-        metodoPago: this.metodoPago.name,
+        metodoPago: this.dropDownMetodoPago.selected.name,
         tipoDistribucion: this.tipoDistribucion.name,
         totalOrden: this.total,
         productos: Object.values(this.ordenDetalleProductos),
@@ -448,6 +410,7 @@ export default {
   },
   mounted() {
     this.date = todayDate();
+    console.log("Mounted");
   },
   watch: {
     searchProduct: function (val) {
@@ -457,12 +420,12 @@ export default {
   },
 };
 function todayDate() {
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-  var yyyy = today.getFullYear();
-  var horas = today.getHours();
-  var minutos = today.getMinutes();
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  const yyyy = today.getFullYear();
+  const horas = today.getHours();
+  const minutos = today.getMinutes();
   return `${mm}-${dd}-${yyyy} ${horas}:${minutos}`;
 }
 function twoDecimalsOnly(value) {
@@ -560,7 +523,7 @@ function twoDecimalsOnly(value) {
   box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
 }
 .bodyMenu {
-  /* height: 100%; */
+  height: 100%;
   vertical-align: top;
   position: relative;
 }
@@ -726,5 +689,15 @@ input::-webkit-input-placeholder {
   justify-content: flex-end;
   padding: 1rem;
   border-top: 1px solid #e9ecef;
+}
+#metPagoDropdown {
+  text-align: center;
+}
+.metPago {
+  background-image: url(https://media0.giphy.com/media/dmmBhPUnCSF9ibuTEo/giphy.gif?cid=ecf05e47r8zkck2cj8uf4ukx8lxvo9mo5ye41w242dtjk5qi&rid=giphy.gif&ct=g);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: bottom;
+  height: 100%;
 }
 </style>

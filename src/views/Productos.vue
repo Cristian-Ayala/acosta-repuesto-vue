@@ -4,98 +4,100 @@
       <div style="margin-top: 2rem; margin-bottom: 3rem">
         <div class="card">
           <div class="card-header">
-            <h6 class="text-uppercase mb-0" style="display: inline-block">
-              Productos
-            </h6>
-            <b-button
-              variant="success"
-              v-on:click="addProd(tab)"
-              v-if="windowWidth >= 1000"
-            >
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </b-button>
-            <!-- for mobile action -->
-            <b-button
-              v-b-modal.addEditProdMovile
-              v-if="windowWidth < 1000"
-              variant="success"
-              v-on:click="
-                prodSelected({});
-                title = 'Agregar producto';
-              "
-              ><i class="fa fa-plus" aria-hidden="true"></i
-            ></b-button>
-            <!-- end of mobile action -->
-          </div>
-          <!-- Filtros para teléfono -->
-          <div v-if="windowWidth < 1000" class="filtros">
-            <div class="d-inline-flex pr-2 pb-2">
+            <div class="cardHeaderWrapper">
+              <h6 class="text-uppercase mb-0" style="display: inline-block">
+                Productos
+              </h6>
               <b-button
-                v-b-modal.modalFiltros
-                pill
-                variant="info"
-                class="btn-sm pr-2 pl-2"
-                >Filtros ({{ allFilters.length }})</b-button
+                variant="success"
+                v-on:click="addProd(tab)"
+                v-if="windowWidth >= 1000"
               >
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </b-button>
+              <!-- for mobile action -->
+              <b-button
+                v-b-modal.addEditProdMovile
+                v-if="windowWidth < 1000"
+                variant="success"
+                v-on:click="
+                  prodSelected({});
+                  title = 'Agregar producto';
+                "
+                ><i class="fa fa-plus" aria-hidden="true"></i
+              ></b-button>
             </div>
-            <div
-              class="d-inline-flex auto-scroll pb-2"
-              v-if="allFilters && allFilters.length > 0"
-            >
-              <b-button
-                pill
-                variant="outline-info"
-                class="btn-sm pr-2 pl-2"
-                disabled
-                v-for="filter in allFilters"
-                :key="filter"
-                >{{ filter }}</b-button
+            <!-- end of mobile action -->
+            <!-- Filtros para teléfono -->
+            <div v-if="windowWidth < 1000" class="filtros">
+              <div class="d-inline-flex pr-2 pb-2">
+                <b-button
+                  v-b-modal.modalFiltros
+                  pill
+                  variant="info"
+                  class="btn-sm pr-2 pl-2"
+                  >Filtros ({{ allFilters.length }})</b-button
+                >
+              </div>
+              <div
+                class="d-inline-flex auto-scroll pb-2"
+                v-if="allFilters && allFilters.length > 0"
               >
+                <b-button
+                  pill
+                  variant="outline-info"
+                  class="btn-sm pr-2 pl-2"
+                  disabled
+                  v-for="filter in allFilters"
+                  :key="filter"
+                  >{{ filter }}</b-button
+                >
+              </div>
             </div>
           </div>
           <!-- Fin de Filtros para teléfono -->
+          <b-card
+            v-for="prod in productos"
+            :img-src="prod.doc.foto"
+            img-alt="Card image"
+            img-top
+            border-variant="dark"
+            align="center"
+            class="cardProductosMobile"
+            :key="prod.upc"
+          >
+            <b-card-text>
+              <h5>{{ prod.doc.nombreProd }}</h5>
+              UPC: {{ prod.doc.upc }}<br />
+              P.M.: <b>${{ prod.doc.precioMayoreo }}</b
+              ><br />
+              P.P.: <b>${{ prod.doc.precioPublico }}</b
+              ><br />
+              P.T.: <b>${{ prod.doc.precioTaller }}</b
+              ><br />
+              Stock: {{ prod.doc.stockProd }}<br />
+              Marca: {{ prod.doc.nombreMarca }}<br />
+              Categoria: {{ prod.doc.nombreCategoria }}<br />
+              <!-- for mobile action -->
+              <b-button
+                v-b-modal.addEditProdMovile
+                @click="
+                  prodSelected(prod);
+                  title = 'Editar producto';
+                "
+                class="btn btn-outline-warning btn-circle"
+                ><i class="fas fa-pencil-alt" aria-hidden="true" />
+              </b-button>
+              <b-button
+                v-b-modal.deleteProduc
+                @click="prodSelected(prod)"
+                class="btn btn-outline-danger btn-circle"
+                ><i class="fas fa-times" aria-hidden="true" />
+              </b-button>
+              <!-- end of mobile action -->
+            </b-card-text>
+          </b-card>
           <div v-if="windowWidth < 1000" style="padding: 1rem">
-            <b-card
-              v-for="prod in productos"
-              :img-src="prod.doc.foto"
-              img-alt="Card image"
-              img-top
-              border-variant="dark"
-              align="center"
-              class="cardProductosMobile"
-              :key="prod.upc"
-            >
-              <b-card-text>
-                <h5>{{ prod.doc.nombreProd }}</h5>
-                UPC: {{ prod.doc.upc }}<br />
-                P.M.: <b>${{ prod.doc.precioMayoreo }}</b
-                ><br />
-                P.P.: <b>${{ prod.doc.precioPublico }}</b
-                ><br />
-                P.T.: <b>${{ prod.doc.precioTaller }}</b
-                ><br />
-                Stock: {{ prod.doc.stockProd }}<br />
-                Marca: {{ prod.doc.nombreMarca }}<br />
-                Categoria: {{ prod.doc.nombreCategoria }}<br />
-                <!-- for mobile action -->
-                <b-button
-                  v-b-modal.addEditProdMovile
-                  @click="
-                    prodSelected(prod);
-                    title = 'Editar producto';
-                  "
-                  class="btn btn-outline-warning btn-circle"
-                  ><i class="fas fa-pencil-alt" aria-hidden="true" />
-                </b-button>
-                <b-button
-                  v-b-modal.deleteProduc
-                  @click="prodSelected(prod)"
-                  class="btn btn-outline-danger btn-circle"
-                  ><i class="fas fa-times" aria-hidden="true" />
-                </b-button>
-                <!-- end of mobile action -->
-              </b-card-text>
-            </b-card>
             <div class="mt-3">
               <b-pagination
                 v-model="currentPageLocal"
@@ -609,8 +611,8 @@ td input {
     margin: 5px;
   }
   .card.cardProductosMobile {
-    border: 1px solid #7b7b7b !important;
     margin-bottom: 1rem;
+    box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 40%);
   }
   .cardProductosMobile {
     width: 100%;
@@ -628,8 +630,25 @@ td input {
   box-shadow: 1px 0.5rem 0.8rem rgb(0 0 0 / 10%);
   padding: 0.5rem;
   display: flex;
+  border-radius: 1rem;
 }
 ::v-deep .card-header {
+  box-shadow: 0 0.125rem 0.8rem rgb(0 0 0 / 10%);
+  display: block;
+  padding: 0;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+}
+.cardHeaderWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+::v-deep .card {
+  background-color: #f8f9fb;
+  border: none;
   box-shadow: none;
 }
 ::v-deep .auto-scroll {

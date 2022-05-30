@@ -10,17 +10,6 @@ export default {
         },
         searchDisplay: "",
         ordSelected: {},
-        metPago: [{
-            "name": "Tarjeta de Crédito"
-        }, {
-            "name": "Tarjeta de Débito"
-        }, {
-            "name": "Efectivo"
-        }, {
-            "name": "Credito Fiscal"
-        }, {
-            "name": "Criptomoneda"
-        }],
         detalleOrden: [],
         activaOrd: [],
         prodSearch: "",

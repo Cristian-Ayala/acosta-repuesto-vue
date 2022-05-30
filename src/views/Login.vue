@@ -60,19 +60,30 @@ export default {
     // Fin del trigger para comenzar script para probar si las cookies de terceros estan habilitadas
   },
   methods: {
-    login() {
-      var that = this;
-      remoteUsuarios
-        .logIn(this.username, this.password)
-        .then((res) => {
-          if (res.ok) {
-            that.$router.push({ path: "/" });
-          }
-        })
-        .catch(function (err) {
-          console.log(JSON.stringify(err));
-          that.error = true;
-        });
+    async login() {
+      // const settings = {
+      //     method: 'POST',
+      //     headers: {
+      //         Accept: 'application/json',
+      //         'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //         name: "",
+      //         password: "",
+      //     }),
+      //     credentials: 'include',
+      // };
+      try {
+        // const fetchResponse = await fetch("https://www.couchdb.me/_session", settings);
+        // const data = await fetchResponse.json();
+        // console.log(data);
+        // this.$router.push({ path: "/" });
+        const result = await remoteUsuarios.logIn(this.username, this.password)
+        if (result.ok) this.$router.push({ path: "/" });
+      } catch (error) {
+          console.error(JSON.stringify(error));
+          this.error = true;        
+      }
     },
     areCookiesEnabled() {
       try {

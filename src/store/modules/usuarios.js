@@ -200,6 +200,7 @@ export default {
                         throw new Error(JSON.stringify("No hay usuario"));
                     }
                 }).catch(() => {
+                    // console.log("No hay sesión");
                     router.push({
                         path: "/login"
                     }).catch(() => {});

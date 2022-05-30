@@ -48,7 +48,7 @@ export default {
     this.initDB();
     this.initDbCategorias();
     this.initDbProductos();
-    this.initDBUsuarios();
+    // this.initDBUsuarios();
     this.initDbOrdenes();
   },
 };
