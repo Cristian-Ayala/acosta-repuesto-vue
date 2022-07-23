@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- inicio del modal para eliminar (mobile) -->
-    <b-modal id="addEditProdMovile" :title="title" centered>
+    <b-modal id="addEditProdMovile" :title="title" centered @show="modalIsActive" @hide="modalWillHide">
       <div v-if="newProductMobile">
         <div class="form-group row">
           <label class="col-md-3 form-control-label">UPC:</label>
@@ -217,6 +217,11 @@ import { blobToURL, fromBlob } from "image-resize-compress";
 import AgregarMar from "@/components/Marcas/AgregarMar.vue";
 import AgregarCat from "@/components/Categorias/AgregarCat.vue";
 import UPCReader from "@/components/Productos/UPCReader.vue";
+
+// Variables for upc barcode scanner
+let code = "";
+let reading = false;
+
 export default {
   name: "AddEditProdMovile",
   props: {
@@ -315,13 +320,38 @@ export default {
       this.descripcionDropdown = categoria.nombreCategoria;
       this.categoriaSelected(categoria.nombreCategoria);
     },
+    modalIsActive() {
+      document.addEventListener('keypress', this.listenerFunction);
+    },
+    modalWillHide() {
+      document.removeEventListener('keypress', this.listenerFunction);
+    },
+    listenerFunction(e) {
+      //usually scanners throw an 'Enter' key at the end of read
+      if (e.key === 'Enter') {
+        if (code.length > 10) {
+          this.newProductMobile.doc.upc = code;
+          /// code ready to use
+          code = "";
+        }
+      } else {
+        code += e.key; //while this is not an 'enter' it stores the every key
+      }
+      //run a timeout of 200ms at the first read and clear everything
+      if (!reading) {
+        reading = true;
+        setTimeout(() => {
+          code = "";
+          reading = false;
+        }, 200); //200 works fine for me but you can adjust it
+      }
+    },
   },
   computed: {
     ...mapState("productos", ["newProductMobile"]),
     ...mapState("marcas", ["marcas"]),
     ...mapState("categorias", ["categorias"]),
   },
-  mounted() {},
   watch: {
     newProductMobile: {
       // This will let Vue know to look inside the array

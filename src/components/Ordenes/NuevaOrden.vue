@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="nuevaOrden" centered title="Nueva Orden">
+    <b-modal id="nuevaOrden" centered title="Nueva Orden" @show="modalIsActive" @hide="modalWillHide">
       <template v-slot:modal-header v-if="paso === 'productos'">
         <a class="ltStepBack" @click="paso = 'datos'"> &lt; </a>
         <h4 class="d-flex align-items-center">
@@ -218,6 +218,7 @@
             size="m"
             variant="success"
             @click="paso = 'pago'"
+            :disabled="total <= 0"
           >
             Pagar
           </b-button>
@@ -248,6 +249,10 @@ import DatePick from "@/components/Calendario/vueDatePick.vue";
 import FindProductos from "@/components/Ordenes/FindProductos.vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 import ResumenNuevaOrden from "./ResumenNuevaOrden.vue";
+
+// Variables for upc barcode scanner
+let code = "";
+let reading = false;
 
 export default {
   name: "NuevaOrden",
@@ -385,13 +390,45 @@ export default {
         ...localOrder
       };
       await this.createRegistroOrdenes(orden);
-      // Clear Data
+      this.clearData();
+    },
+    clearData() {
       this.ordenDetalleProductos = {};
       this.total = 0.0;
       this.paso = "datos";
       this.orden = {
           "nombreCliente": "",
           "observacionesOrden": "",
+      }
+      this.searchProduct = '';
+      this.searchProductos('');
+    },
+    modalIsActive() {
+      document.addEventListener('keypress', this.listenerFunction);
+    },
+    modalWillHide() {
+      document.removeEventListener('keypress', this.listenerFunction);
+      this.clearData();
+    },
+    listenerFunction(e) {
+      //usually scanners throw an 'Enter' key at the end of read
+      if (e.key === 'Enter') {
+        if (code.length > 10) {
+          this.searchProduct = code;
+          console.log(code);
+          /// code ready to use
+          code = "";
+        }
+      } else {
+        code += e.key; //while this is not an 'enter' it stores the every key
+      }
+      //run a timeout of 200ms at the first read and clear everything
+      if (!reading) {
+        reading = true;
+        setTimeout(() => {
+          code = "";
+          reading = false;
+        }, 200); //200 works fine for me but you can adjust it
       }
     },
   },

@@ -47,19 +47,16 @@
       </button>
     </div>
     <!-- Fin del Cuerpo a escribir -->
-    <DetalleOrden></DetalleOrden>
     <NuevaOrden></NuevaOrden>
   </div>
 </template>
 <script>
-import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
 import NuevaOrden from "@/components/Ordenes/NuevaOrden.vue";
 import { mapState, mapMutations } from "vuex";
 import OrderView from '../components/Ordenes/OrderView.vue';
 export default {
   name: "Ordenes",
   components: {
-    DetalleOrden,
     NuevaOrden,
     OrderView,
   },

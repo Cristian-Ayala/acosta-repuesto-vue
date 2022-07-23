@@ -19,13 +19,19 @@
       <div v-if="orden && typeof orden.totalOrden === 'number'">
         $ {{ orden.totalOrden }}
       </div>
-      <a href="#" @click="showModalViewDetails = true"> Ver detalles </a>
+      <a href="#" @click="showModalViewDetails = !showModalViewDetails"> Ver detalles </a>
     </div>
+    <DetalleOrden :ordSelected="orden" :showDetOrd="showModalViewDetails"></DetalleOrden>
   </div>
 </template>
 <script>
+import DetalleOrden from "@/components/Ordenes/DetalleOrden.vue";
+
 export default {
   props: ["orden"],
+  components: {
+    DetalleOrden,
+  },
   data() {
     return {
       showModalViewDetails: false,
@@ -55,8 +61,8 @@ export default {
     },
   },
   mounted() {
-    console.log({ ...this.orden });
-},
+    // console.log({ ...this.orden });
+  },
 };
 </script>
 <style scoped>

@@ -7,6 +7,7 @@
       size="xl"
       title=""
       @show="getFilters"
+      @hide="clearFilters"
     >
       <h5>UPC</h5>
       <div class="input-group">
@@ -107,9 +108,20 @@
 // import { mapState, mapMutations, mapActions } from "vuex";
 import { mapActions, mapMutations, mapState } from "vuex";
 
+// Variables for upc barcode scanner
+let code = "";
+let reading = false;
+
 export default {
   name: "FiltrosProductos",
-
+  props: {
+    show: {
+      type: Object,
+      default: () => ({
+        modalFiltros: false,
+      }),
+    },
+  },
   data: () => {
     return {
       tmpFiltroMarcasActivas: [],
@@ -143,6 +155,37 @@ export default {
       this.tmpFiltroCategoriasActivas = [...this.filtroCategorias];
       this.tmpFiltroNombre = this.filtroNombre.toString();
       this.tmpFiltroUPC = this.filtroUPC.toString();
+      document.addEventListener('keypress', this.listenerFunction);
+    },
+    clearFilters() {
+      document.removeEventListener('keypress', this.listenerFunction);
+    },
+    listenerFunction(e) {
+      //usually scanners throw an 'Enter' key at the end of read
+      if (e.key === 'Enter') {
+        if (code.length > 10) {
+          this.tmpFiltroUPC = code;
+          this.aplicarFiltros({
+              cat: [],
+              mar: [],
+              upc: this.tmpFiltroUPC,
+              nom: '',
+            });
+          this.$bvModal.hide('modalFiltros');
+          /// code ready to use
+          code = "";
+        }
+      } else {
+        code += e.key; //while this is not an 'enter' it stores the every key
+      }
+      //run a timeout of 200ms at the first read and clear everything
+      if (!reading) {
+        reading = true;
+        setTimeout(() => {
+          code = "";
+          reading = false;
+        }, 200); //200 works fine for me but you can adjust it
+      }
     },
   },
   watch: {

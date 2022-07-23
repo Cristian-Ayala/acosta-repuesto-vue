@@ -5,7 +5,8 @@
     </td>
     <td>
       <div class="h-100">
-        <p class="align-self-center" v-html="prod.highlighting.nombreProd"></p>
+        <p class="align-self-center" v-html="prod.highlighting.nombreProd" v-if="prod.highlighting.nombreProd"></p>
+        <p class="align-self-center" v-else>{{ prod.doc.nombreProd }}</p>
         <h6 style="color: #009722">${{ prod.doc.precioPublico }}</h6>
         Stock: {{ prod.doc.stockProd }}
         <div v-if="showQuantity">

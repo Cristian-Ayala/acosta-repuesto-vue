@@ -4,29 +4,19 @@
       id="detalleOrden"
       centered
       title="Detalle Orden"
-      v-model="showDetOrd"
+      v-model="alwaysTrue"
+      v-if="showDetOrd"
     >
       <div class="card-body">
-        <div class="row">
-          <div class="column">
-            <h5>Id de la orden:</h5>
-            <p>{{ ordSelected.idOrden }}</p>
-          </div>
-          <div class="column">
-            <h5>Fecha:</h5>
-            <p>{{ ordSelected.fechaOrd }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="column">
-            <h5>Nombre del cliente:</h5>
-            <p>{{ ordSelected.nombreCliente }}</p>
-          </div>
-          <div class="column">
-            <h5>Método de pago:</h5>
-            <p>{{ ordSelected.metodoPago }}</p>
-          </div>
-        </div>
+        <h5>Fecha:</h5>
+        <p>{{ formatDate(ordSelected._id) }}</p>
+
+        <h5 v-if="ordSelected.nombreCliente">Nombre del cliente:</h5>
+        <p>{{ ordSelected.nombreCliente }}</p>
+
+        <h5>Método de pago:</h5>
+        <p>{{ ordSelected.metodoPago }}</p>
+
         <div class="line"></div>
         <div>
           <b-card no-body class="text-center">
@@ -48,14 +38,15 @@
           Total: {{ ordSelected.totalOrden }}
         </h6>
         <div class="line"></div>
-        <div class="row">
-          <div class="column">
-            <h5>Descripción:</h5>
-          </div>
-          <div class="column">
-            <p>{{ ordSelected.observacionesOrden }}</p>
-          </div>
-        </div>
+        <h5 v-if="ordSelected.observacionesOrden">Descripción:</h5>
+        <p>{{ ordSelected.observacionesOrden }}</p>
+
+        <h5>Tipo de orden:</h5>
+        <p>{{ ordSelected.tipoOrden }}</p>
+
+        <h5>Tipo de distribución:</h5>
+        <p>{{ ordSelected.tipoDistribucion }}</p>
+        
         <div class="line"></div>
       </div>
 
@@ -72,10 +63,9 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
-
 export default {
   name: "DetalleOrden",
+  props: ["ordSelected", "showDetOrd"],
   data() {
     return {
       headerLabels: [
@@ -86,25 +76,23 @@ export default {
         { key: "precioUnit", label: "Precio unitario" },
         "cantidad",
         "descuento",
-        {
-          key: "total",
-          label: "Total",
-          formatter: (a, b, item) => {
-            return (
-              item.cantidad * item.precioUnit -
-              item.cantidad * item.precioUnit * (item.descuento / 100)
-            ).toFixed(2);
-          },
-        },
+        { key: "subtotal", label: "Sub-Total" },
       ],
+      alwaysTrue: true,
     };
   },
   methods: {
-    //Esto es invento xD
-    ...mapMutations("ordenes", ["getOrdenSelected"]),
+    formatDate(id) {
+        let date = new Date(id);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString('en-US', { hour12: true })}`;
+    },
   },
-  computed: {
-    ...mapState("ordenes", ["ordSelected", "showDetOrd"]),
+  watch: {
+    alwaysTrue: {
+      handler(newValue) {
+        if (!newValue) this.alwaysTrue = true;
+      }
+    }
   },
 };
 </script>

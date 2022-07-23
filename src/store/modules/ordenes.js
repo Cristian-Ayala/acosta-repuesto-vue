@@ -155,7 +155,7 @@ export default {
         readAllOrdenes({ state }) {
             return state.localOrdenes.allDocs({
                 include_docs: true,
-                descending: false
+                descending: true
             }).then((result) => {
                 console.log("read", result);
                 state.ordenes = result.rows;
